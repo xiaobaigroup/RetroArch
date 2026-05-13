@@ -1,5 +1,6 @@
 import { AbilityConstant, ConfigurationConstant, UIAbility, Want } from '@kit.AbilityKit';
-import testNapi, { StartParams } from 'libretroarch.so';
+import retroApi, { StartParams } from 'libretroarch.so';
+
 
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { window } from '@kit.ArkUI';
@@ -8,6 +9,7 @@ import { Xb_GlobalContext } from 'xb_components';
 import zlib from '@ohos.zlib';
 
 const DOMAIN = 0x0000;
+
 
 export default class EntryAbility extends UIAbility {
   onCreate(want: Want, launchParam: AbilityConstant.LaunchParam): void {
@@ -56,7 +58,7 @@ export default class EntryAbility extends UIAbility {
     }catch (e) {
       console.error("testTag", e)
     }
-    testNapi.startApp({
+    retroApi.startApp({
       CONFIGFILE: configPath,
       IME:"",
       DATADIR: dataDir,
