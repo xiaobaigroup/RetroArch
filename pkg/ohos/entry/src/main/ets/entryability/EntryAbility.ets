@@ -4,13 +4,15 @@ import testNapi, { StartParams } from 'libretroarch.so';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { window } from '@kit.ArkUI';
 import { fileIo } from '@kit.CoreFileKit';
+import { Xb_GlobalContext } from 'xb_components';
+import zlib from '@ohos.zlib';
 
 const DOMAIN = 0x0000;
 
 export default class EntryAbility extends UIAbility {
   onCreate(want: Want, launchParam: AbilityConstant.LaunchParam): void {
     try {
-
+      Xb_GlobalContext.initContext(this.context)
       this.context.getApplicationContext().setColorMode(ConfigurationConstant.ColorMode.COLOR_MODE_NOT_SET);
     } catch (err) {
       hilog.error(DOMAIN, 'testTag', 'Failed to set colorMode. Cause: %{public}s', JSON.stringify(err));
@@ -27,8 +29,10 @@ export default class EntryAbility extends UIAbility {
     hilog.info(DOMAIN, 'testTag', '%{public}s', 'Ability onWindowStageCreate');
     windowStage.getMainWindowSync().setPreferredOrientation(window.Orientation.AUTO_ROTATION_LANDSCAPE_RESTRICTED)
     windowStage.getMainWindowSync().setWindowSystemBarEnable([])
-    await this.StartApp();
-    windowStage.loadContent('pages/Index', (err) => {
+
+    windowStage.loadContent('pages/Index', async (err) => {
+
+      await this.StartApp();
       if (err.code) {
         hilog.error(DOMAIN, 'testTag', 'Failed to load the content. Cause: %{public}s', JSON.stringify(err));
         return;
@@ -37,21 +41,21 @@ export default class EntryAbility extends UIAbility {
     });
   }
   async StartApp(){
-    let dataDir = this.context?.filesDir + "/RetroArch";
+    await Xb_GlobalContext.initDownloadDir()
+    let dataDir =  Xb_GlobalContext.downloadDir + "/RetroArch";
     let configPath = dataDir + "/retroarch.cfg";
     try {
-      if(!await fileIo.access(this.context?.filesDir + "/RetroArch")){
-        await fileIo.mkdir(this.context?.filesDir + "/RetroArch")
+      if(!await fileIo.access(dataDir)){
+        await fileIo.mkdir(dataDir)
       }
       if(!await fileIo.access(configPath, fileIo.AccessModeType.EXIST)){
-
         let file = await fileIo.open(configPath, fileIo.OpenMode.CREATE);
         await fileIo.close(file.fd);
       }
+
     }catch (e) {
       console.error("testTag", e)
     }
-
     testNapi.startApp({
       CONFIGFILE: configPath,
       IME:"",
@@ -59,7 +63,20 @@ export default class EntryAbility extends UIAbility {
       LIBRETRO: dataDir + "/cores",
       ROM: "",
     } as StartParams);
+     this.initAssets();
   }
+  async initAssets(){
+    let dataDir =  Xb_GlobalContext.downloadDir + "/RetroArch";
+    let assetsDir = dataDir +"/assets";
+    if(!await fileIo.access(assetsDir)){
+      await fileIo.mkdir(assetsDir)
+    }
+    let assetsCount = (await fileIo.listFile(assetsDir)).length;
+    if(assetsCount == 0){
+      await zlib.decompressFile(this.context.resourceDir + "/assets.zip", assetsDir);
+    }
+  }
+
   onWindowStageDestroy(): void {
     // Main window is destroyed, release UI related resources
     hilog.info(DOMAIN, 'testTag', '%{public}s', 'Ability onWindowStageDestroy');

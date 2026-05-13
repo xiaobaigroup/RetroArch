@@ -28,7 +28,6 @@ struct Index {
         .constraintSize({ maxWidth: '100%', maxHeight: '100%' })
         .onLoad(()=>{
           setTimeout(()=>{
-
           }, 1000)
         }).onTouch((e: TouchEvent)=>{
 
