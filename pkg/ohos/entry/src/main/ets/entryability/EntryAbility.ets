@@ -29,7 +29,7 @@ export default class EntryAbility extends UIAbility {
   async onWindowStageCreate(windowStage: window.WindowStage): Promise<void> {
     // Main window is created, set main page for this ability
     hilog.info(DOMAIN, 'testTag', '%{public}s', 'Ability onWindowStageCreate');
-    windowStage.getMainWindowSync().setPreferredOrientation(window.Orientation.AUTO_ROTATION_LANDSCAPE_RESTRICTED)
+    windowStage.getMainWindowSync().setPreferredOrientation(window.Orientation.AUTO_ROTATION)
     windowStage.getMainWindowSync().setWindowSystemBarEnable([])
 
     windowStage.loadContent('pages/Index', async (err) => {
@@ -54,7 +54,7 @@ export default class EntryAbility extends UIAbility {
         let file = await fileIo.open(configPath, fileIo.OpenMode.CREATE);
         await fileIo.close(file.fd);
       }
-
+      await this.initAssets();
     }catch (e) {
       console.error("testTag", e)
     }
@@ -65,7 +65,7 @@ export default class EntryAbility extends UIAbility {
       LIBRETRO: dataDir + "/cores",
       ROM: "",
     } as StartParams);
-     this.initAssets();
+
   }
   async initAssets(){
     let dataDir =  Xb_GlobalContext.downloadDir + "/RetroArch";

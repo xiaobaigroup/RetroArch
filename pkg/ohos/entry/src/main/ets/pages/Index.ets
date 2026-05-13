@@ -55,7 +55,7 @@ struct Index {
   }
   onBackPress(): boolean | void {
     // TODO 弹出提示退出
-    retroApi.sendCtl(CtlType.App_SHUTDOWN)
+    //ßretroApi.sendCtl(CtlType.App_SHUTDOWN)
     return true;
   }
 

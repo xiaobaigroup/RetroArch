@@ -242,6 +242,7 @@ target_link_libraries(${PROJECT_NAME}
     EGL
     OpenSLES
     z
+    deviceinfo_ndk.z
     native_window
     hilog_ndk.z
 )
