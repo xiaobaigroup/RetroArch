@@ -73,7 +73,7 @@ export default class EntryAbility extends UIAbility {
     }catch (e) {
       console.error("testTag", e)
     }
-    let coresDir =  this.context.bundleCodeDir + "/libs/arm64"
+    let coresDir =  this.context.bundleCodeDir + "/libs/arm64/cores"
 
     emitter.emit({eventId:100000});
     retroApi.startApp({
@@ -88,6 +88,7 @@ export default class EntryAbility extends UIAbility {
   async initAssets(dataDir: string){
     await this.installAssets(dataDir, "assets");
     await this.installAssets(dataDir, "overlays");
+    await this.installAssets(dataDir, "info");
   }
 
   async installAssets(dataDir: string, name: string){
