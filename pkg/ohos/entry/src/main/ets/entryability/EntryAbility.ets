@@ -5,17 +5,22 @@ import retroApi, { StartParams } from 'libretroarch.so';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { window } from '@kit.ArkUI';
 import { fileIo } from '@kit.CoreFileKit';
-import { Xb_GlobalContext } from 'xb_components';
+import { Xb_GlobalContext, Xb_PreferenceUtil } from 'xb_components';
 import zlib from '@ohos.zlib';
+import { RetroSettings } from './RetroSetting';
 
 const DOMAIN = 0x0000;
 
 
 export default class EntryAbility extends UIAbility {
-  onCreate(want: Want, launchParam: AbilityConstant.LaunchParam): void {
+  async onCreate(want: Want, launchParam: AbilityConstant.LaunchParam): Promise<void> {
     try {
       Xb_GlobalContext.initContext(this.context)
-      this.context.getApplicationContext().setColorMode(ConfigurationConstant.ColorMode.COLOR_MODE_NOT_SET);
+      // 配置为深色模式
+      this.context.getApplicationContext().setColorMode(ConfigurationConstant.ColorMode.COLOR_MODE_DARK);
+      await Xb_PreferenceUtil.init(this.context, 'retro_arch_preference')
+      // 加载配置
+      RetroSettings.load()
     } catch (err) {
       hilog.error(DOMAIN, 'testTag', 'Failed to set colorMode. Cause: %{public}s', JSON.stringify(err));
     }
