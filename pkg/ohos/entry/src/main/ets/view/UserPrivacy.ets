@@ -170,7 +170,7 @@ struct Welcome {
     // Logo & 欢迎语
     Column({space: 15}) {
       // logo
-      Image($r(`app.media.startIcon`))
+      Image($r(`app.media.app_icon_round`))
         .borderRadius(25)
         .height(106)
         .zIndex(1)

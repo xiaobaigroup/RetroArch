@@ -67,15 +67,14 @@ struct Index {
       scrollSizeMode: ScrollSizeMode.CONTINUOUS,
       keyboardAvoidMode: SheetKeyboardAvoidMode.RESIZE_ONLY,
       onWillSpringBackWhenDismiss: () => {},
-      onWillAppear: () => {
-      },
+      onWillAppear: () => {},
+      onAppear: () => {},
       onWillDismiss: (dis) => {
         if (!RetroState.showWelcome) {
           dis.dismiss()
         }
       },
-      onDisappear: () => {
-      }
+      onDisappear: () => {}
     })
   }
 
@@ -94,7 +93,7 @@ struct Index {
       setTimeout(() => {
         RetroState.showWelcome = true;
         console.debug(`onPageShow: 半模态页已显示：${RetroState.showWelcome}`);
-      }, 100);
+      }, 1000);
     }
   }
 
