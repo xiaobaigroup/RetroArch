@@ -134,19 +134,6 @@ void ohos_input_poll_touch_event(
          || action == EVENT_ACTION_Cancel);
    if (keyup && motion_ptr < MAX_TOUCH)
    {
-      if (event.type == 1 && ENABLE_TOUCH_SCREEN_MOUSE)
-      {
-         /* If touchscreen was pressed for less than 200ms
-          * then register time stamp of a quick tap */
-         if ((event.eventTime-ohos->downTime)/1000000 < 200)
-         {
-            /* Prevent the quick tap if a button on the overlay is down */
-            input_driver_state_t *input_st = input_state_get_ptr();
-            if (!(input_st->flags & INP_FLAG_BLOCK_POINTER_INPUT))
-               ohos->quick_tap_time = event.pointerCount;
-         }
-         ohos->mouse_l = 0;
-      }
       memmove(ohos->pointer + motion_ptr,
             ohos->pointer + motion_ptr + 1,
             (MAX_TOUCH - motion_ptr - 1) * sizeof(struct input_pointer));
@@ -156,30 +143,6 @@ void ohos_input_poll_touch_event(
    else
    {
       int pointer_max  = MIN(event.pointerCount, MAX_TOUCH);
-
-      if (action == EVENT_ACTION_DOWN && ENABLE_TOUCH_SCREEN_MOUSE)
-      {
-         /* When touch screen is pressed, set mouse
-          * previous position to current position
-          * before starting to calculate mouse movement deltas. */
-         ohos->mouse_x_prev = TouchEvent_getX(event, motion_ptr);
-         ohos->mouse_y_prev = TouchEvent_getY(event, motion_ptr);
-
-         /* If another touch happened within 200ms after a quick tap
-          * then cancel the quick tap and register left mouse button
-          * as being held down */
-         if ((event.eventTime - ohos->quick_tap_time)/1000000 < 200)
-         {
-            ohos->quick_tap_time = 0;
-            ohos->mouse_l        = 1;
-         }
-      }
-
-//      if ((  action == EVENT_ACTION_MOVE
-//               || action == EVENT_ACTION_HOVER_MOVE)
-//            && ENABLE_TOUCH_SCREEN_MOUSE)
-        // android_mouse_calculate_deltas(ohos,event,motion_ptr,source);
-
       for (motion_ptr = 0; motion_ptr < pointer_max; motion_ptr++)
       {
          struct video_viewport vp = {0};
@@ -209,10 +172,6 @@ void ohos_input_poll_touch_event(
       }
    }
 
-   /* If more than one pointer detected
-    * then count it as a mouse right click */
-   if (ENABLE_TOUCH_SCREEN_MOUSE)
-      ohos->mouse_r = (ohos->pointer_count == 2);
 }
 
 static void ohos_input_poll_main_cmd(void)
