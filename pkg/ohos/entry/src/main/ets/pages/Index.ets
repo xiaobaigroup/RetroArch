@@ -1,5 +1,5 @@
 import retroApi, { StartParams } from 'libretroarch.so';
-import { RetroSettings } from '../entryability/RetroSetting';
+import { RetroSettings, _RetroSettings } from '../entryability/RetroSetting';
 import { RetroState } from '../entryability/RetroState';
 import { User } from '../view/UserPrivacy';
 import { emitter } from '@kit.BasicServicesKit';
@@ -24,6 +24,7 @@ class GameXComponentController extends XComponentController{
 struct Index {
   private xController = new GameXComponentController();
   @Local loading: boolean = true;
+
   aboutToAppear(): void {
     emitter.on({eventId: 100000}, ()=>{
         this.loading = false
@@ -57,9 +58,9 @@ struct Index {
         }
       }
     }.width('100%')
-    .foregroundBlurStyle(RetroState.showWelcome ? BlurStyle.BACKGROUND_THIN : BlurStyle.NONE,
+    .foregroundBlurStyle(RetroState.showBlur ? BlurStyle.BACKGROUND_THIN : BlurStyle.NONE,
       { colorMode: ThemeColorMode.SYSTEM, adaptiveColor: AdaptiveColor.DEFAULT, scale: 0.3 })
-    .bindSheet(RetroState.showWelcome!!, this.Welcome(), {
+   /* .bindSheet(RetroState.showWelcome!!, this.Welcome(), {
       height: 650,
       dragBar: false,
       showClose: false,
@@ -67,15 +68,20 @@ struct Index {
       scrollSizeMode: ScrollSizeMode.CONTINUOUS,
       keyboardAvoidMode: SheetKeyboardAvoidMode.RESIZE_ONLY,
       onWillSpringBackWhenDismiss: () => {},
-      onWillAppear: () => {},
-      onAppear: () => {},
+      onWillAppear: () => {
+        RetroState.showBlur = true
+      },
       onWillDismiss: (dis) => {
         if (!RetroState.showWelcome) {
           dis.dismiss()
         }
+        RetroState.showBlur = false
       },
-      onDisappear: () => {}
-    })
+    }) 用官方隐私*/
+  }
+
+  public vpToPx(vp: number) {
+    return this.getUIContext().vp2px(vp)
   }
 
   @Builder
@@ -83,18 +89,15 @@ struct Index {
     User()
   }
 
-  public vpToPx(vp: number) {
-    return this.getUIContext().vp2px(vp)
-  }
-
   onPageShow(): void {
-    if (RetroSettings.first_start) {
+   /* if (RetroSettings.first_start) {
       // 延迟显示弹窗
       setTimeout(() => {
         RetroState.showWelcome = true;
         console.debug(`onPageShow: 半模态页已显示：${RetroState.showWelcome}`);
       }, 1000);
-    }
+
+    } 用官方隐私*/
   }
 
   onBackPress(): boolean | void {
@@ -102,5 +105,4 @@ struct Index {
     //ßretroApi.sendCtl(CtlType.App_SHUTDOWN)
     return true;
   }
-
 }

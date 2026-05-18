@@ -83,11 +83,11 @@ export struct User {
       .height(RetroSettings.first_start ? 72 : 27)
       .width('100%')
       .justifyContent(FlexAlign.Center)
-      .backgroundColor($r('sys.color.background_secondary'))
+      .backgroundColor($r('sys.color.background_tertiary'))
       .padding({ top: this.needTopMargin ? 8 : undefined })
     }
     .alignContent(Alignment.Top)
-    .backgroundColor($r('sys.color.background_secondary'))
+    .backgroundColor($r('sys.color.background_tertiary'))
   }
 
 }
