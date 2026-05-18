@@ -131,12 +131,12 @@ static char app_dir[DIR_MAX_LENGTH];
 unsigned storage_permissions             = 0;
 struct android_app *g_android            = NULL;
 static uint8_t g_platform_android_flags  = 0;
-#elif __OHOS__
+#elif defined(__OHOS__)
 static pthread_key_t thread_key;
 static char app_dir[DIR_MAX_LENGTH];
 unsigned storage_permissions             = 0;
 struct ohos_app *g_ohos            = NULL;
-static uint8_t g_platform_android_flags  = 0;
+static napi_threadsafe_function g_native_event_tsfn = NULL;
 #else
 #define PROC_APM_PATH                    "/proc/apm"
 #define PROC_ACPI_BATTERY_PATH           "/proc/acpi/battery"
@@ -732,7 +732,7 @@ JNIEXPORT void JNICALL Java_com_retroarch_browser_retroactivity_RetroActivityCom
    }
 #endif
 }
-#elif __OHOS__
+#elif defined(__OHOS__)
 
 #elif !defined(DINGUX)
 static bool make_proc_acpi_key_val(char **_ptr, char **_key, char **_val)
@@ -1275,7 +1275,7 @@ static enum frontend_powerstate frontend_unix_get_powerstate(
    *percent = battery_level;
 
    ret = (enum frontend_powerstate)powerstate;
-#elif __OHOS__
+#elif defined(__OHOS__)
 
 #elif defined(RETROFW)
    *percent = retrofw_get_battery_level(&ret);
@@ -1461,7 +1461,7 @@ static size_t frontend_unix_get_os(char *s,
    int rel;
    frontend_android_get_version(major, minor, &rel);
    _len = strlcpy(s, "Android", len);
-#elif __OHOS__
+#elif defined(__OHOS__)
    *major = 0;
    char buffer[128];
    const char* os = OH_GetDistributionOSName();
@@ -1936,7 +1936,7 @@ static void frontend_unix_get_env(int *argc,
       g_defaults.overlay_enable = false;
       strlcpy(g_defaults.settings_menu, "ozone", sizeof(g_defaults.settings_menu));
    }
-#elif __OHOS__
+#elif defined(__OHOS__)
    int32_t major, minor, rel;
    struct rarch_main_wrap      *args  = NULL;
    struct ohos_app   *ohos_app  = (struct ohos_app*)data;
@@ -2505,7 +2505,7 @@ static void frontend_unix_deinit(void *data)
 
 static void frontend_unix_init(void *data)
 {
-#ifdef __OHOS__
+#if defined(__OHOS__)
 struct ohos_app* ohos_app  = (struct ohos_app*)data;
 slock_lock(ohos_app->mutex);
 ohos_app->running = 1;
@@ -2779,7 +2779,7 @@ static int frontend_unix_parse_drive_list(void *data, bool load_content)
                   FILE_TYPE_DIRECTORY, 0, 0, NULL);
       }
    }
-#elifdef __OHOS__
+#elif defined(__OHOS__)
     menu_entries_append(list,
             g_ohos->startParams->DATADIR,
             msg_hash_to_str(MSG_INTERNAL_STORAGE),
@@ -2882,7 +2882,7 @@ static int frontend_unix_parse_drive_list(void *data, bool load_content)
 
 #ifdef ANDROID
    if (!g_android->is_play_store_build)
-#elifdef __OHOS__
+#elif defined(__OHOS__)
    if (0)     
 #else
    if (1)
@@ -3491,7 +3491,7 @@ enum retro_language frontend_unix_get_user_language(void)
          (*env)->ReleaseStringUTFChars(env, jstr, lang_str);
       }
    }
-#elifdef __OHOS__
+#elif defined(__OHOS__)
       if (!g_ohos)
          return RETRO_LANGUAGE_CHINESE_SIMPLIFIED;
       if (!string_is_equal(g_ohos->startParams->Lang, ""))
@@ -3745,13 +3745,28 @@ static enum rarch_display_type frontend_unix_get_display_type(void)
 }
 
 #ifdef __OHOS__
+typedef struct {
+    int event_id; 
+    int value;
+} NativeEventData;    
 void ohos_input_poll_touch_event(void* ohos_input, TouchEvent data);
+void ohos_input_poll_key_event(void* ohos_input, KeyEvent* data);
+
+
+bool ohos_keyboard_start(char **buffer_ptr, size_t *size_ptr, size_t *ptr_ptr,
+                                const char *label,
+                                input_keyboard_line_complete_t callback, void *userdata){
+    
+   ohos_send_native_event(EVENT_NATIVE_OPEN_KEYBOARD, 0);
+   return true;
+}
+
 
 static void frontend_ohos_shutdown(bool unused)
 {
    (void)unused;
    /* Cleaner approaches don't work sadly. */
-   exit(0);
+   ohos_send_native_event(EVENT_NATIVE_APP_SHUTDOWN, 0);
 }
 void frontend_ohos_get_name(char *s, size_t len)
 {
@@ -3867,6 +3882,7 @@ static napi_value StartApp(napi_env env, napi_callback_info info)
   
    return NULL;
 }
+
 static napi_value OnTouchEvent(napi_env env, napi_callback_info info)
 {
     if(g_ohos == NULL || g_ohos->ohos_input == NULL)
@@ -3917,6 +3933,98 @@ static napi_value OnTouchEvent(napi_env env, napi_callback_info info)
     ohos_input_poll_touch_event(g_ohos->ohos_input, event);
     return NULL;
 }
+
+void ohos_send_native_event(int event_id, int value) {
+   if (g_native_event_tsfn == NULL) {
+        return;
+    }
+    NativeEventData* event = (NativeEventData*)malloc(sizeof(NativeEventData));
+    if (event == NULL) {
+        return;
+    }
+    event->event_id = event_id;
+    event->value = value;
+    napi_call_threadsafe_function(g_native_event_tsfn, event, napi_tsfn_blocking);
+}
+
+static napi_value OnKeyEvent(napi_env env, napi_callback_info info)
+{
+    if(g_ohos == NULL || g_ohos->ohos_input == NULL)
+        return NULL;
+    size_t argc = 1;
+    napi_value args[1];
+    napi_status status = napi_get_cb_info(env, info, &argc, args, NULL, NULL);
+    KeyEvent event;
+    napi_value temp_val;
+     napi_get_named_property(env, args[0], "deviceId", &temp_val);
+    napi_get_value_int32(env, temp_val, &event.deviceId);
+    
+    // 提取 type
+    napi_get_named_property(env, args[0], "type", &temp_val);
+    napi_get_value_int32(env, temp_val, &event.type);
+    
+    // 提取 pointerCount
+    napi_get_named_property(env, args[0], "keyCode", &temp_val);
+    napi_get_value_int32(env, temp_val, &event.keyCode);
+    
+    // 提取 eventTime (uint64_t)
+    napi_get_named_property(env, args[0], "timestamp", &temp_val);
+    napi_get_value_int64(env, temp_val, &event.timestamp);
+  
+    ohos_input_poll_key_event(g_ohos->ohos_input, &event);
+    return NULL;
+}
+static void CallJsCallback(napi_env env, napi_value js_callback, void* context, void* data) {
+     NativeEventData* event = (NativeEventData*)data;
+    
+    if (event == NULL) {
+        return;
+    }
+    
+    napi_value argv[2];  
+    napi_status status;
+    
+    status = napi_create_int32(env, event->event_id, &argv[0]);
+    if (status != napi_ok) {
+        free(event);
+        return;
+    }
+    
+    status = napi_create_int32(env, event->value, &argv[1]);
+    if (status != napi_ok) {
+        free(event);
+        return;
+    }
+    napi_value undefined;
+    status = napi_call_function(env, NULL, js_callback, 2, argv, &undefined);
+    free(event);
+}
+
+static napi_value OnNativeEvent(napi_env env, napi_callback_info info)
+{
+   if(g_ohos == NULL)
+        return NULL;
+   size_t argc = 1;
+   napi_value args[1];
+   napi_status status = napi_get_cb_info(env, info, &argc, args, NULL, NULL);
+   napi_value resource_name;
+   napi_create_string_utf8(env, "NativeEventCallback", NAPI_AUTO_LENGTH, &resource_name);
+   status = napi_create_threadsafe_function(
+     env,
+     args[0],
+     NULL,
+     resource_name,
+     0,
+     1,        
+     NULL,
+     NULL,
+     NULL,
+     CallJsCallback,
+     &g_native_event_tsfn
+   );
+   return NULL;
+}
+
 static napi_value SurfaceChanged(napi_env env, napi_callback_info info)
 {
    size_t argc = 3;
@@ -3975,7 +4083,9 @@ static napi_value Init(napi_env env, napi_value exports)
        { "sendCtl", NULL, SendCtl, NULL, NULL, NULL, napi_default, NULL },
        { "surfaceChanged", NULL, SurfaceChanged, NULL, NULL, NULL, napi_default, NULL },
        { "startApp", NULL, StartApp, NULL, NULL, NULL, napi_default, NULL },
-       { "onTouchEvent", NULL, OnTouchEvent, NULL, NULL, NULL, napi_default, NULL }
+       { "onNativeEvent", NULL, OnNativeEvent, NULL, NULL, NULL, napi_default, NULL },
+       { "onTouchEvent", NULL, OnTouchEvent, NULL, NULL, NULL, napi_default, NULL },
+       { "onKeyEvent", NULL, OnKeyEvent, NULL, NULL, NULL, napi_default, NULL }
     };
     napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc);
     return exports;
@@ -4015,7 +4125,7 @@ frontend_ctx_driver_t frontend_ctx_unix = {
 #ifdef ANDROID
    frontend_android_shutdown,    /* shutdown */
    frontend_android_get_name,    /* get_name */
-#elif __OHOS__
+#elif defined(__OHOS__)
    frontend_ohos_shutdown,    /* shutdown */
    frontend_ohos_get_name,    /* get_name */
 #else
@@ -4065,7 +4175,7 @@ frontend_ctx_driver_t frontend_ctx_unix = {
    frontend_unix_get_display_type,
 #ifdef ANDROID
    "android",                    /* ident               */
-#elifdef __OHOS__
+#elif defined(__OHOS__)
    "ohos",                    /* ident               */
 #else
    "unix",                       /* ident               */

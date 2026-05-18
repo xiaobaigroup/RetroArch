@@ -3,11 +3,13 @@ import { RetroSettings, _RetroSettings } from '../entryability/RetroSetting';
 import { RetroState } from '../entryability/RetroState';
 import { User } from '../view/UserPrivacy';
 import { emitter } from '@kit.BasicServicesKit';
+import { common, UIAbility } from '@kit.AbilityKit';
+import { KeyCode } from '@kit.InputKit';
 
-enum CtlType{
-  App_SHUTDOWN = 0
+enum NativeEventId{
+  EVENT_NATIVE_OPEN_KEYBOARD,
+  EVENT_NATIVE_APP_SHUTDOWN
 }
-
 class GameXComponentController extends XComponentController{
   onSurfaceCreated(surfaceId: string): void {
     retroApi.surfaceChanged(parseInt(surfaceId), 0, 0)
@@ -24,10 +26,18 @@ class GameXComponentController extends XComponentController{
 struct Index {
   private xController = new GameXComponentController();
   @Local loading: boolean = true;
-
+  @Local openKeyboard: boolean = false
   aboutToAppear(): void {
     emitter.on({eventId: 100000}, ()=>{
         this.loading = false
+    })
+    retroApi.onNativeEvent((eventId: number, value: number)=>{
+      if(eventId == NativeEventId.EVENT_NATIVE_APP_SHUTDOWN){
+        (this.getUIContext().getHostContext() as common.UIAbilityContext)?.terminateSelf();
+      }
+      if(eventId == NativeEventId.EVENT_NATIVE_OPEN_KEYBOARD){
+        this.openKeyboard = true;
+      }
     })
   }
 
@@ -51,7 +61,9 @@ struct Index {
               } as TouchObject
             })
           })
-        })
+      }).defaultFocus(true).focusable(true).onKeyEvent((e: KeyEvent)=>{
+        retroApi.onKeyEvent(e)
+      })
       if(this.loading){
         Row () {
           Text("加载资源中").fontColor(Color.White)
@@ -102,7 +114,29 @@ struct Index {
 
   onBackPress(): boolean | void {
     // TODO 弹出提示退出
-    //ßretroApi.sendCtl(CtlType.App_SHUTDOWN)
+    if(this.openKeyboard){
+      this.openKeyboard = false
+      this.SendKeyEvent(KeyCode.KEYCODE_ENTER)
+    }else{
+      this.SendKeyEvent(KeyCode.KEYCODE_DEL)
+    }
+
     return true;
   }
+
+  private SendKeyEvent(keycode: number){
+    retroApi.onKeyEvent({
+      type: 0,
+      keyCode: keycode,
+      source: KeySource.Keyboard,
+    })
+    setTimeout(()=>{
+      retroApi.onKeyEvent({
+        type: 1,
+        keyCode: keycode,
+        source: KeySource.Keyboard,
+      })
+    }, 100)
+  }
+
 }
