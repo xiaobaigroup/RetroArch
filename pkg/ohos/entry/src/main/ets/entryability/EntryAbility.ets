@@ -1,16 +1,25 @@
 import { AbilityConstant, ConfigurationConstant, UIAbility, Want } from '@kit.AbilityKit';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { window } from '@kit.ArkUI';
-import { Xb_GlobalContext, Xb_PreferenceUtil } from 'xb_components';
+import { SmartAvoidance, Xb_AvoidanceManager, Xb_GlobalContext, Xb_PreferenceUtil, Xb_ToastUtil } from 'xb_components';
 import { RetroSettings } from './RetroSetting';
-import { fileIo, fileUri, picker } from '@kit.CoreFileKit';
-import { emitter, zlib } from '@kit.BasicServicesKit';
 import { retroArchVM } from '../RetroArchViewModel';
+import { RetroState } from './RetroState';
 
 const DOMAIN = 0x0000;
 
 
 export default class EntryAbility extends UIAbility {
+
+  private avoidManager: Xb_AvoidanceManager | undefined = undefined;
+  private avoidListener: (avoidance: SmartAvoidance) => void = (newAvoidance) => {
+    RetroState.bottomRectHeight = newAvoidance.bottom
+    RetroState.topRectHeight = newAvoidance.top
+    RetroState.leftAvoidWidth = newAvoidance.left
+    RetroState.rightAvoidWidth = newAvoidance.right
+    console.debug(`EntryAbility avoidListener: ${JSON.stringify(newAvoidance)}`)
+  }
+
   async onCreate(want: Want, launchParam: AbilityConstant.LaunchParam): Promise<void> {
     try {
       retroArchVM.init(this.context)
@@ -31,16 +40,39 @@ export default class EntryAbility extends UIAbility {
     retroArchVM.stopApp();
   }
 
+  onWindowStageWillDestroy(windowStage: window.WindowStage): void {
+    retroArchVM.stopApp()
+    // 销毁避让管理器并移除监听
+    if (this.avoidManager) {
+      this.avoidManager.offChangeListener(this.avoidListener);
+      this.avoidManager.destroy();
+      this.avoidManager = undefined;
+    }
+  }
+
   async onWindowStageCreate(windowStage: window.WindowStage): Promise<void> {
     // Main window is created, set main page for this ability
     hilog.info(DOMAIN, 'testTag', '%{public}s', 'Ability onWindowStageCreate');
-    windowStage.getMainWindowSync().setPreferredOrientation(window.Orientation.AUTO_ROTATION_UNSPECIFIED)
-    windowStage.getMainWindowSync().setWindowSystemBarEnable([])
+    const mainWindow = windowStage.getMainWindowSync();
+    mainWindow.setPreferredOrientation(window.Orientation.AUTO_ROTATION_UNSPECIFIED);
+    mainWindow.setWindowSystemBarEnable([]);
+    await mainWindow.setWindowLayoutFullScreen(true);
     windowStage.loadContent('pages/Index', async (err) => {
       await retroArchVM.StartApp();
       if (err.code) {
         hilog.error(DOMAIN, 'testTag', 'Failed to load the content. Cause: %{public}s', JSON.stringify(err));
         return;
+      }
+      try {
+        const data = await windowStage.getMainWindow()
+        Xb_ToastUtil.initContext(data.getUIContext(), this.context)
+        // 获取布局避让遮挡的区域
+        this.avoidManager = new Xb_AvoidanceManager(mainWindow, data.getUIContext());
+        await this.avoidManager.init();
+        // 注册监听器，当避让值变化时，更新UI状态
+        this.avoidManager.onChangeListener(this.avoidListener);
+      } catch (error) {
+        console.error(`onWindowStageCreate error: ${error.message}`)
       }
       hilog.info(DOMAIN, 'testTag', 'Succeeded in loading the content.');
     });
@@ -60,4 +92,5 @@ export default class EntryAbility extends UIAbility {
     // Ability has back to background
     hilog.info(DOMAIN, 'testTag', '%{public}s', 'Ability onBackground');
   }
+
 }

@@ -42,6 +42,7 @@ export class RetroArchViewModel{
   }
   init(context: common.UIAbilityContext){
     this.context = context;
+    this.currentRotation = display.getDefaultDisplaySync().rotation
     display.on("change", ()=>{
       this.currentRotation = display.getDefaultDisplaySync().rotation
     })
