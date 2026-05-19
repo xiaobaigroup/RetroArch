@@ -4,7 +4,7 @@ import { RetroState } from '../entryability/RetroState';
 import { User } from '../view/UserPrivacy';
 import { KeyCode } from '@kit.InputKit';
 import { RetroArchViewModel, retroArchVM } from '../RetroArchViewModel';
-
+import window from '@ohos.window';
 
 class GameXComponentController extends XComponentController{
   onSurfaceCreated(surfaceId: string): void {
@@ -24,7 +24,13 @@ struct Index {
   @Local viewmodel: RetroArchViewModel = retroArchVM;
   aboutToAppear(): void {
   }
-
+  GetAspectRatio(): number{
+    if(this.viewmodel.currentRotation == window.Orientation.PORTRAIT || this.viewmodel.currentRotation == window.Orientation.PORTRAIT_INVERTED){
+      return 16 /9
+    }
+    else
+      return  9/16
+  }
   build() {
     Stack() {
       XComponent({id:"game", type: XComponentType.TEXTURE, controller: this.xController})
@@ -32,7 +38,7 @@ struct Index {
         .width('100%')
         .height('100%')
         .constraintSize({ maxWidth: '100%', maxHeight: '100%' })
-        .aspectRatio(!this.viewmodel.fullScreen ? 16/9: undefined)
+        .aspectRatio(!this.viewmodel.fullScreen ? this.GetAspectRatio(): undefined)
         .onLoad(()=>{ }).onTouch((e: TouchEvent)=>{
           retroApi.onTouchEvent({
             id: e.touches[e.touches.length - 1]?.id ?? 0,
