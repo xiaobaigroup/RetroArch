@@ -20,6 +20,7 @@
 
 
 
+
 #include <stdbool.h>
 #include <stdint.h>
 
@@ -33,6 +34,7 @@
 #endif
 
 #ifdef __OHOS__
+#include <GameControllerKit/game_device_event.h>
 #include <ace/xcomponent/native_interface_xcomponent.h>
 #include <multimodalinput/oh_key_code.h>
 #include <rthreads/rthreads.h>
@@ -79,11 +81,11 @@ static const ButtonMapping BUTTON_MAPPING_TABLE[] = {
     {KEYCODE_BUTTON_THUMBR, 107},  // R3 (右摇杆按下)
     
     // D-Pad 方向键
-    {KEYCODE_DPAD_UP, 19},   // DPAD_UP
-    {KEYCODE_DPAD_DOWN, 20},   // DPAD_DOWN
-    {KEYCODE_DPAD_LEFT, 21},   // DPAD_LEFT
-    {KEYCODE_DPAD_RIGHT, 22},   // DPAD_RIGHT
-    {KEYCODE_DPAD_CENTER, 23},   // DPAD_CENTER
+//    {KEYCODE_DPAD_UP, 19},   // DPAD_UP
+//    {KEYCODE_DPAD_DOWN, 20},   // DPAD_DOWN
+//    {KEYCODE_DPAD_LEFT, 21},   // DPAD_LEFT
+//    {KEYCODE_DPAD_RIGHT, 22},   // DPAD_RIGHT
+//    {KEYCODE_DPAD_CENTER, 23},   // DPAD_CENTER
 };
 static const int MAPPING_COUNT = sizeof(BUTTON_MAPPING_TABLE) / sizeof(BUTTON_MAPPING_TABLE[0]);
 
@@ -157,7 +159,12 @@ typedef struct {
     char Lang[NAME_MAX];
     int  DPI;
 } StartParams;
-
+typedef struct {
+    char id[20];
+    char name[NAME_MAX];
+    int versionId;
+    int productId;
+} JoypadInfo;
 
 extern struct ohos_app *g_ohos;
 
@@ -210,8 +217,8 @@ struct ohos_app
    uint16_t rumble_last_strength_weak[MAX_USERS];
    uint16_t rumble_last_strength[MAX_USERS];
    int id[MAX_USERS];
-
-   bool is_play_store_build;
+   JoypadInfo joypads[MAX_USERS];
+   int joypad_count;
 
 };
 #endif

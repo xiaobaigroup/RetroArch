@@ -159,6 +159,37 @@ void ohos_input_poll_touch_event(
    }
 
 }
+JoypadInfo* find_by_id(JoypadInfo joypads[], int size, char* target_id) {
+    for (int i = 0; i < size; i++) {
+        if (strcmp(joypads[i].id, target_id) == 0) {
+            return &joypads[i];
+        }
+    }
+    return NULL;  // 未找到
+}
+static void handle_device_hotplug(struct ohos_app *ohos_app, int *port, char* deviceId)
+{
+   ohos_input_t* ohos = ohos_app->ohos_input;
+   if (*port < 0)
+      *port = ohos->pads_connected;
+   JoypadInfo* joypad = find_by_id(g_ohos->joypads, g_ohos->joypad_count,deviceId);
+   if(joypad == NULL)
+      return;
+   input_autoconfigure_connect(
+         joypad->name,
+         NULL, NULL,
+         ohos_joypad.ident,
+         *port,
+         joypad->versionId,
+         joypad->productId);
+   //ohos->pad_states[ohos->pads_connected].id  = ohos_app->id[ohos->pads_connected]  = id;
+   strlcpy(ohos->pad_states[*port].id, deviceId, sizeof(ohos->pad_states[*port].id));
+   ohos->pad_states[ohos->pads_connected].port = *port;
+   strlcpy(ohos->pad_states[*port].name, joypad->name, sizeof(ohos->pad_states[*port].name));
+   ohos->pads_connected ++;
+}
+
+
 
 void ohos_input_poll_button_event(
     void  *ohos_input, int port, GamePad_ButtonEvent *event)
@@ -292,13 +323,17 @@ static void OnAxisEvent(const struct GamePad_AxisEvent *axisEvent){
    char *deviceId = NULL;
    OH_GamePad_AxisEvent_GetDeviceId(axisEvent, &deviceId);
    int port = ohos_input_get_id_port(g_ohos->ohos_input, deviceId, 0);
+   if (port < 0)
+      handle_device_hotplug(g_ohos, &port,deviceId);
    engine_handle_dpad_getaxisvalue(g_ohos, axisEvent, port);
 }
 static void OnButtonEvent(const struct GamePad_ButtonEvent *buttonEvent){
    char *deviceId = NULL;
    OH_GamePad_ButtonEvent_GetDeviceId(buttonEvent, &deviceId);
    int port = ohos_input_get_id_port(g_ohos->ohos_input, deviceId, 0);
-   ohos_input_poll_button_event(g_ohos->ohos_input,port, buttonEvent);
+   if (port < 0)
+      handle_device_hotplug(g_ohos, &port,deviceId);
+   ohos_input_poll_button_event(g_ohos->ohos_input, port, buttonEvent);
 }
 static void OnDeviceChanged(const struct GameDevice_DeviceEvent *deviceEvent){
    GameDevice_StatusChangedType type;
@@ -340,20 +375,16 @@ static void OnDeviceChanged(const struct GameDevice_DeviceEvent *deviceEvent){
    }
    char *name = NULL;
    OH_GameDevice_DeviceInfo_GetName(deviceInfo, &name);
-   ohos_input_t* ohos = g_ohos->ohos_input;
-   int port = ohos->pads_connected;
-   input_autoconfigure_connect(
-   name,
-   NULL, NULL,
-   ohos_joypad.ident,
-   port,
-   versionId,
-   productId);
-   strlcpy(ohos->pad_states[port].id, deviceId, sizeof(ohos->pad_states[port].id));
-   ohos->pad_states[ohos->pads_connected].port = port;
-   strlcpy(ohos->pad_states[port].name, name, sizeof(ohos->pad_states[port].name));
-   ohos->pads_connected ++;
+   int count = g_ohos->joypad_count;
+   strlcpy(g_ohos->joypads[count].id, deviceId, sizeof(g_ohos->joypads[count].id));
+   strlcpy(g_ohos->joypads[count].name, name, sizeof(g_ohos->joypads[count].name));
+   g_ohos->joypads[count].productId = productId;
+   g_ohos->joypads[count].versionId = versionId;
+   g_ohos->joypad_count++;
 }
+
+
+
 
 static int ohos_check_quick_tap(ohos_input_t *ohos)
 {
@@ -635,9 +666,6 @@ static float ohos_input_get_sensor_input(void *data, unsigned port, unsigned id)
 
    switch (id)
    {
-//      case RETRO_SENSOR_ILLUMINANCE:
-//         if (ohos->illuminance_sensor)
-//            return linux_get_illuminance_reading(ohos->illuminance_sensor);
       default:
          break;
    }

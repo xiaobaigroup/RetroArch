@@ -169,9 +169,9 @@ static int16_t ohos_joypad_state(
 {
    int i;
    int16_t ret                          = 0;
+   struct ohos_app *ohos_app      = (struct ohos_app*)g_ohos;
+   uint8_t *buf                         = ohos_keyboard_state_get(port);
    uint16_t port_idx                    = joypad_info->joy_idx;
-   const struct ohos_joypad    *pad = (const struct ohos_joypad*)
-      &ohos_pads[port_idx];
 
    if (port_idx >= MAX_USERS)
       return 0;
@@ -183,12 +183,14 @@ static int16_t ohos_joypad_state(
          ? binds[i].joykey  : joypad_info->auto_binds[i].joykey;
       const uint32_t joyaxis = (binds[i].joyaxis != AXIS_NONE)
          ? binds[i].joyaxis : joypad_info->auto_binds[i].joyaxis;
-      if ((uint16_t)joykey != NO_BTN &&
-            (joykey < NUM_BUTTONS)   &&
-            (BIT32_GET(pad->buttons, joykey)))
+      if ((uint16_t)joykey != NO_BTN
+            && ohos_joypad_button_state(
+               ohos_app,
+               buf,
+               port_idx, (uint16_t)joykey))
          ret |= ( 1 << i);
       else if (joyaxis != AXIS_NONE &&
-            ((float)abs(ohos_joypad_axis_state(pad, port_idx, joyaxis))
+            ((float)abs(ohos_joypad_axis_state(ohos_app, port_idx, joyaxis))
              / 0x8000) > joypad_info->axis_threshold)
          ret |= (1 << i);
    }
