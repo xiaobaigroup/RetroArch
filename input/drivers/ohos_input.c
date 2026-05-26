@@ -292,10 +292,10 @@ static void engine_handle_dpad_getaxisvalue(struct ohos_app *ohos, const struct 
    double rz          = 0;
    double hatx        = 0;
    double haty        = 0;
-   double ltrig       = 0;
-   double rtrig       = 0;
    double brake       = 0;
    double gas         = 0;
+   GamePad_AxisSourceType type = 0;
+   OH_GamePad_AxisEvent_GetAxisSourceType(axisEvent, &type);
    OH_GamePad_AxisEvent_GetXAxisValue(axisEvent, &x);
    OH_GamePad_AxisEvent_GetYAxisValue(axisEvent, &y);
    OH_GamePad_AxisEvent_GetZAxisValue(axisEvent, &z);
@@ -304,29 +304,30 @@ static void engine_handle_dpad_getaxisvalue(struct ohos_app *ohos, const struct 
    OH_GamePad_AxisEvent_GetHatYAxisValue(axisEvent, &haty);
    OH_GamePad_AxisEvent_GetBrakeAxisValue(axisEvent, &brake);
    OH_GamePad_AxisEvent_GetGasAxisValue(axisEvent, &gas);
-//   OH_GamePad_AxisEvent_GetBrakeAxisValue(axisEvent, &ltrig);
-//   OH_GamePad_AxisEvent_GetGasAxisValue(axisEvent, &rtrig);
-    
-   ohos->hat_state[port][0]    = (int)hatx;
-   ohos->hat_state[port][1]    = (int)haty;
+   if(type == DPAD){
+      ohos->hat_state[port][0]    = (int)hatx;
+      ohos->hat_state[port][1]    = (int)haty;
+   }
+   if(type == LEFT_THUMBSTICK){
+      ohos->analog_state[port][0] = (int16_t)(x * 32767.0f);
+      ohos->analog_state[port][1] = (int16_t)(y * 32767.0f);
+   }
+   if(type == RIGHT_THUMBSTICK){
+      ohos->analog_state[port][2] = (int16_t)(z * 32767.0f);
+      ohos->analog_state[port][3] = (int16_t)(rz * 32767.0f);
+   }
+   if(type == LEFT_TRIGGER){
+      ohos->analog_state[port][8] = (int16_t)(brake * 32767.0f);
+   }
+   if(type == RIGHT_TRIGGER){
+      ohos->analog_state[port][9] = (int16_t)(gas * 32767.0f);
+   }
 
-   ohos->analog_state[port][0] = (int16_t)(x * 32767.0f);
-   ohos->analog_state[port][1] = (int16_t)(y * 32767.0f);
-   ohos->analog_state[port][2] = (int16_t)(z * 32767.0f);
-   ohos->analog_state[port][3] = (int16_t)(rz * 32767.0f);
-   ohos->analog_state[port][6] = (int16_t)(ltrig * 32767.0f);
-   ohos->analog_state[port][7] = (int16_t)(rtrig * 32767.0f);
-//   ohos->analog_state[port][8] = (int16_t)(brake * 32767.0f);
-//   ohos->analog_state[port][9] = (int16_t)(gas * 32767.0f);
+
+
+  
 }
-static void OnAxisEvent(const struct GamePad_AxisEvent *axisEvent){
-   char *deviceId = NULL;
-   OH_GamePad_AxisEvent_GetDeviceId(axisEvent, &deviceId);
-   int port = ohos_input_get_id_port(g_ohos->ohos_input, deviceId, 0);
-   if (port < 0)
-      handle_device_hotplug(g_ohos, &port,deviceId);
-   engine_handle_dpad_getaxisvalue(g_ohos, axisEvent, port);
-}
+
 static void OnButtonEvent(const struct GamePad_ButtonEvent *buttonEvent){
    char *deviceId = NULL;
    OH_GamePad_ButtonEvent_GetDeviceId(buttonEvent, &deviceId);
@@ -335,6 +336,16 @@ static void OnButtonEvent(const struct GamePad_ButtonEvent *buttonEvent){
       handle_device_hotplug(g_ohos, &port,deviceId);
    ohos_input_poll_button_event(g_ohos->ohos_input, port, buttonEvent);
 }
+
+static void OnAxisEvent(const struct GamePad_AxisEvent *axisEvent){
+   char *deviceId = NULL;
+   OH_GamePad_AxisEvent_GetDeviceId(axisEvent, &deviceId);
+   int port = ohos_input_get_id_port(g_ohos->ohos_input, deviceId, 0);
+   if (port < 0)
+      handle_device_hotplug(g_ohos, &port,deviceId);
+   engine_handle_dpad_getaxisvalue(g_ohos, axisEvent, port);
+}
+
 static void OnDeviceChanged(const struct GameDevice_DeviceEvent *deviceEvent){
    GameDevice_StatusChangedType type;
    GameController_ErrorCode err = OH_GameDevice_DeviceEvent_GetChangedType(deviceEvent, &type);
