@@ -168,7 +168,8 @@ void ohos_input_poll_button_event(
    int keycode = 0;
    OH_GamePad_ButtonEvent_GetButtonAction(event, &action);
    OH_GamePad_ButtonEvent_GetButtonCode(event, &keycode);
-   int keysym  = keycode;
+   // 兼容 android autoconfig
+   int keysym  = ohos_keycode_to_android(keycode);
    switch (action)
    {
       case UP:

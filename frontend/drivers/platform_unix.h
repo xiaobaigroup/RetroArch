@@ -18,7 +18,8 @@
 #ifndef _PLATFORM_UNIX_H
 #define _PLATFORM_UNIX_H
 
-#include <ace/xcomponent/native_interface_xcomponent.h>
+
+
 #include <stdbool.h>
 #include <stdint.h>
 
@@ -32,7 +33,8 @@
 #endif
 
 #ifdef __OHOS__
-#include <deviceinfo.h>
+#include <ace/xcomponent/native_interface_xcomponent.h>
+#include <multimodalinput/oh_key_code.h>
 #include <rthreads/rthreads.h>
 #include "../../input/input_driver.h"
 #include <native_window/external_window.h>
@@ -48,6 +50,52 @@ extern void ohos_show_file_picker(void);
 extern void ohos_send_native_event(int event_id, int value);
 
 struct ohos_app;
+typedef struct {
+    int ohos_code;
+    int android_code;
+} ButtonMapping;
+// 静态映射表（OHOS → Android）
+static const ButtonMapping BUTTON_MAPPING_TABLE[] = {
+    // 手柄字母按键
+    {KEYCODE_BUTTON_A, 96},   // A
+    {KEYCODE_BUTTON_B, 97},   // B
+    {2303, 98},               // C ?
+    {KEYCODE_BUTTON_X, 99},   // X
+    {KEYCODE_BUTTON_Y, 100},  // Y
+    
+    // 肩键/扳机
+    {KEYCODE_BUTTON_L1, 102},  // L1
+    {KEYCODE_BUTTON_R1, 103},  // R1
+    {KEYCODE_BUTTON_L2, 104},  // L2
+    {KEYCODE_BUTTON_R2, 105},  // R2
+    
+    // 功能按键
+    {KEYCODE_BUTTON_SELECT, 109},  // SELECT
+    {KEYCODE_BUTTON_START, 108},  // START
+    {KEYCODE_BUTTON_MODE, 110},  // MODE / HOME
+    
+    // 摇杆按下
+    {KEYCODE_BUTTON_THUMBL, 106},  // L3 (左摇杆按下)
+    {KEYCODE_BUTTON_THUMBR, 107},  // R3 (右摇杆按下)
+    
+    // D-Pad 方向键
+    {KEYCODE_DPAD_UP, 19},   // DPAD_UP
+    {KEYCODE_DPAD_DOWN, 20},   // DPAD_DOWN
+    {KEYCODE_DPAD_LEFT, 21},   // DPAD_LEFT
+    {KEYCODE_DPAD_RIGHT, 22},   // DPAD_RIGHT
+    {KEYCODE_DPAD_CENTER, 23},   // DPAD_CENTER
+};
+static const int MAPPING_COUNT = sizeof(BUTTON_MAPPING_TABLE) / sizeof(BUTTON_MAPPING_TABLE[0]);
+
+static int ohos_keycode_to_android(int ohos_code)
+{
+    for (int i = 0; i < MAPPING_COUNT; i++) {
+        if (BUTTON_MAPPING_TABLE[i].ohos_code == ohos_code) {
+            return BUTTON_MAPPING_TABLE[i].android_code;
+        }
+    }
+    return ohos_code; 
+}
 
 enum
 {
@@ -118,14 +166,14 @@ struct ohos_app
    /* The application can place a pointer to its own state object
     * here if it likes. */
    void* userData;
-   StartParams* startParams;    
+   StartParams* startParams;
    void* ohos_input;
 
    /* When non-NULL, this is the window surface that the app can draw in. */
    OHNativeWindow* window;
-    
+
    OH_NativeXComponent *nativeComponent;
-    
+
    /* Below are "private" implementation of the glue code. */
    slock_t *mutex;
    scond_t *cond;

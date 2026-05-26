@@ -64,6 +64,7 @@
 #endif
 #endif
 #ifdef __OHOS__
+#include <deviceinfo.h>
 #include <ace/xcomponent/native_interface_xcomponent.h>
 #include "napi/native_api.h"
 #include "hilog/log.h"
