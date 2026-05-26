@@ -323,9 +323,6 @@ static void engine_handle_dpad_getaxisvalue(struct ohos_app *ohos, const struct 
       ohos->analog_state[port][9] = (int16_t)(gas * 32767.0f);
    }
 
-
-
-  
 }
 
 static void OnButtonEvent(const struct GamePad_ButtonEvent *buttonEvent){
@@ -384,6 +381,13 @@ static void OnDeviceChanged(const struct GameDevice_DeviceEvent *deviceEvent){
      OH_GameDevice_DestroyDeviceInfo(&deviceInfo);
      return;
    }
+   char* physical = NULL;
+   err = OH_GameDevice_DeviceInfo_GetPhysicalAddress(deviceInfo, &physical);
+   if (err != GAME_CONTROLLER_SUCCESS) {
+     OH_GameDevice_DestroyDeviceInfo(&deviceInfo);
+     return;
+   }
+    
    char *name = NULL;
    OH_GameDevice_DeviceInfo_GetName(deviceInfo, &name);
    int count = g_ohos->joypad_count;

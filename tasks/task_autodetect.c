@@ -172,7 +172,12 @@ static unsigned input_autoconfigure_get_config_file_affinity(
             && (config_pid != 0))
          affinity += 30;
 #endif
-
+#ifdef __OHOS__
+      /* ohos version_id not is vendor_id */
+      if (     (autoconfig_handle->device_info.vid == config_vid && config_vid != 0)
+            || (autoconfig_handle->device_info.pid == config_pid && config_pid != 0))
+         affinity += 20;
+#endif
       /* Check for matching device name */
       _len  = strlcpy(config_key, "input_device",
                sizeof(config_key));
@@ -183,6 +188,13 @@ static unsigned input_autoconfigure_get_config_file_affinity(
             &&  string_is_equal(entry->value,
                 autoconfig_handle->device_info.name))
          affinity += 20;
+#ifdef __OHOS__    
+      else if (     (entry  = config_get_entry(config, config_key))
+            && (entry->value && *entry->value)
+            &&   string_ends_with(entry->value,
+                autoconfig_handle->device_info.name))
+         affinity += 10;
+#endif
 
       /* Check for matching physical location */
       _len  = strlcpy(config_key, "input_phys",
