@@ -70,10 +70,7 @@ static void ohos_gfx_ctx_destroy(void *data)
 
    free(data);
 }
-const int EGL_BLUE_SIZE_DEFAULT = 8;
-const int EGL_RED_SIZE_DEFAULT = 8;
-const int EGL_GREEN_SIZE_DEFAULT = 8;
-const int EGL_ALPHA_SIZE_DEFAULT = 8;
+
 
 static void *ohos_gfx_ctx_init(void *video_driver)
 {

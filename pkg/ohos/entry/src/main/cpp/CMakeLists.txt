@@ -243,9 +243,12 @@ target_link_libraries(${PROJECT_NAME}
     EGL
     OpenSLES
     z
+    ohaudio
     deviceinfo_ndk.z
     native_window
+    ohgame_controller.z
     hilog_ndk.z
+
 )
 if(DEFINED SANITIZER)
     target_compile_options(${PROJECT_NAME} PRIVATE -g -fsanitize=${SANITIZER} -fno-omit-frame-pointer)

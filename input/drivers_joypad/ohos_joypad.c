@@ -136,18 +136,18 @@ static void ohos_joypad_get_buttons(unsigned port, input_bits_t *state)
 		BIT256_CLEAR_ALL_PTR(state);
 }
 static int16_t ohos_joypad_axis_state(
-      struct ohos_app *ohos_app,
+      struct ohos_app *ohos,
       unsigned port, uint32_t joyaxis)
 {
    if (AXIS_NEG_GET(joyaxis) < MAX_AXIS)
    {
-      int16_t val = ohos_app->analog_state[port][AXIS_NEG_GET(joyaxis)];
+      int16_t val = ohos->analog_state[port][AXIS_NEG_GET(joyaxis)];
       if (val < 0)
          return val;
    }
    else if (AXIS_POS_GET(joyaxis) < MAX_AXIS)
    {
-      int16_t val = ohos_app->analog_state[port][AXIS_POS_GET(joyaxis)];
+      int16_t val = ohos->analog_state[port][AXIS_POS_GET(joyaxis)];
       if (val > 0)
          return val;
    }
@@ -155,7 +155,6 @@ static int16_t ohos_joypad_axis_state(
 }
 
 static int16_t ohos_joypad_axis(
-      const struct ohos_joypad *pad,
       unsigned port, uint32_t joyaxis)
 {
    struct ohos_app *ohos_app = (struct ohos_app*)g_ohos;

@@ -36,6 +36,7 @@ export class RetroArchViewModel{
   @Trace openKeyboard: boolean = false;
   @Trace fullScreen: boolean = false;
   @Trace currentRotation: number = 0
+  dataDir: string = "";
   constructor() {
   }
   stopApp(){
@@ -64,7 +65,26 @@ export class RetroArchViewModel{
         const documentSaveOptions = new picker.DocumentSelectOptions();
         documentSaveOptions.selectMode = picker.DocumentSelectMode.FILE;
         const documentViewPicker = new picker.DocumentViewPicker(context);
-        documentViewPicker.select(documentSaveOptions)
+        documentViewPicker.select(documentSaveOptions).then(async  d=>{
+            if(d.length > 0){
+              let uri = new fileUri.FileUri(d[0])
+              let file = await fileIo.statSync(uri.path)
+              let target = this.dataDir+ "/downloads/" + uri.name;
+              if(await file.isFile()){
+                try {
+                  if(! await fileIo.access(target))
+                    await fileIo.copyFile(uri.path, target)
+                  retroApi.openFile(target);
+                }catch (e) {
+                  console.error("复制文件失败:", e)
+                }
+
+              }
+              if(await file.isDirectory()){
+                retroApi.openFile(uri.path);
+              }
+            }
+        })
       }
       if(eventId == NativeEventId.EVENT_NATIVE_SET_SCREEN_ORIENTATION){
         if(value == 0){
@@ -83,7 +103,8 @@ export class RetroArchViewModel{
     })
   }
   async StartApp(){
-    let dataDir = (await initDownloadDir(this.context!) ?? this.context!.filesDir) + "/RetroArch"
+    this.dataDir = (await initDownloadDir(this.context!) ?? this.context!.filesDir) + "/RetroArch"
+    let dataDir = this.dataDir;
     let configPath = dataDir + "/retroarch.cfg";
     try {
       if (!await fileIo.access(dataDir))

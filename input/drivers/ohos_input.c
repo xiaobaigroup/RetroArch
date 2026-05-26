@@ -160,6 +160,25 @@ void ohos_input_poll_touch_event(
 
 }
 
+void ohos_input_poll_button_event(
+    void  *ohos_input, int port, GamePad_ButtonEvent *event)
+{
+   uint8_t *buf = ohos_key_state[port];
+   int action = 0;
+   int keycode = 0;
+   OH_GamePad_ButtonEvent_GetButtonAction(event, &action);
+   OH_GamePad_ButtonEvent_GetButtonCode(event, &keycode);
+   int keysym  = keycode;
+   switch (action)
+   {
+      case UP:
+         BIT_CLEAR(buf, keysym);
+         break;
+      case DOWN:
+         BIT_SET(buf, keysym);
+         break;
+   }
+}
 void ohos_input_poll_key_event(
     void  *ohos_input, KeyEvent *event)
 {
@@ -213,6 +232,7 @@ void ohos_input_poll_key_event(
          break;
    }
 }
+
 static int ohos_input_get_id_port(ohos_input_t *ohos, char* id,
       int source)
 {
@@ -222,7 +242,7 @@ static int ohos_input_get_id_port(ohos_input_t *ohos, char* id,
       ret = 0; /* touch overlay is always user 1 */
    for (i = 0; i < ohos->pads_connected; i++)
    {
-      if (strcmp(ohos->pad_states[i].id, id))
+      if (strcmp(ohos->pad_states[i].id, id) == 0)
       {
          ret = i;
          break;
@@ -269,32 +289,65 @@ static void engine_handle_dpad_getaxisvalue(struct ohos_app *ohos, const struct 
 }
 static void OnAxisEvent(const struct GamePad_AxisEvent *axisEvent){
    char *deviceId = NULL;
-   OH_GameDevice_DeviceInfo_GetDeviceId(axisEvent, &deviceId);
-   free(deviceId);
+   OH_GamePad_AxisEvent_GetDeviceId(axisEvent, &deviceId);
    int port = ohos_input_get_id_port(g_ohos->ohos_input, deviceId, 0);
    engine_handle_dpad_getaxisvalue(g_ohos, axisEvent, port);
 }
+static void OnButtonEvent(const struct GamePad_ButtonEvent *buttonEvent){
+   char *deviceId = NULL;
+   OH_GamePad_ButtonEvent_GetDeviceId(buttonEvent, &deviceId);
+   int port = ohos_input_get_id_port(g_ohos->ohos_input, deviceId, 0);
+   ohos_input_poll_button_event(g_ohos->ohos_input,port, buttonEvent);
+}
 static void OnDeviceChanged(const struct GameDevice_DeviceEvent *deviceEvent){
-    GameDevice_StatusChangedType type;
-    GameController_ErrorCode err = OH_GameDevice_DeviceEvent_GetChangedType(deviceEvent, &type);
-    if (err != GAME_CONTROLLER_SUCCESS) {
-        return;
-    }
-    GameDevice_DeviceInfo *deviceInfo = NULL;
-    err = OH_GameDevice_DeviceEvent_GetDeviceInfo(deviceEvent, &deviceInfo);
-    if (err != GAME_CONTROLLER_SUCCESS || !deviceInfo) {
-        return;
-    }
-    char *deviceId = NULL;
-    err = OH_GameDevice_DeviceInfo_GetDeviceId(deviceInfo, &deviceId);
-    if (err != GAME_CONTROLLER_SUCCESS) {
-        OH_GameDevice_DestroyDeviceInfo(&deviceInfo);
-        return;
-    }
+   GameDevice_StatusChangedType type;
+   GameController_ErrorCode err = OH_GameDevice_DeviceEvent_GetChangedType(deviceEvent, &type);
+   if (err != GAME_CONTROLLER_SUCCESS) {
+     return;
+   }
+   if (type == OFFLINE) {
+     return;
+   }
+   GameDevice_DeviceInfo *deviceInfo = NULL;
+   err = OH_GameDevice_DeviceEvent_GetDeviceInfo(deviceEvent, &deviceInfo);
+   if (err != GAME_CONTROLLER_SUCCESS || !deviceInfo) {
+     return;
+   }
+   char *deviceId = NULL;
+   err = OH_GameDevice_DeviceInfo_GetDeviceId(deviceInfo, &deviceId);
+   if (err != GAME_CONTROLLER_SUCCESS) {
+     OH_GameDevice_DestroyDeviceInfo(&deviceInfo);
+     return;
+   }
+   int productId = 0;
+   err = OH_GameDevice_DeviceInfo_GetProduct(deviceInfo, &productId);
+   if (err != GAME_CONTROLLER_SUCCESS) {
+     OH_GameDevice_DestroyDeviceInfo(&deviceInfo);
+     return;
+   }
+   int versionId = 0;
+   err = OH_GameDevice_DeviceInfo_GetVersion(deviceInfo, &versionId);
+   if (err != GAME_CONTROLLER_SUCCESS) {
+     OH_GameDevice_DestroyDeviceInfo(&deviceInfo);
+     return;
+   }
+   GameDevice_DeviceType deviceType = 0;
+   err = OH_GameDevice_DeviceInfo_GetDeviceType(deviceInfo, &deviceType);
+   if (err != GAME_CONTROLLER_SUCCESS) {
+     OH_GameDevice_DestroyDeviceInfo(&deviceInfo);
+     return;
+   }
    char *name = NULL;
    OH_GameDevice_DeviceInfo_GetName(deviceInfo, &name);
    ohos_input_t* ohos = g_ohos->ohos_input;
    int port = ohos->pads_connected;
+   input_autoconfigure_connect(
+   name,
+   NULL, NULL,
+   ohos_joypad.ident,
+   port,
+   versionId,
+   productId);
    strlcpy(ohos->pad_states[port].id, deviceId, sizeof(ohos->pad_states[port].id));
    ohos->pad_states[ohos->pads_connected].port = port;
    strlcpy(ohos->pad_states[port].name, name, sizeof(ohos->pad_states[port].name));
@@ -348,12 +401,33 @@ static void *ohos_input_init(const char *joypad_driver)
             rate = DEFAULT_ASENSOR_EVENT_RATE;
       }
    }
-//   OH_GameDevice_RegisterDeviceMonitor(OnDeviceChanged);
-//   OH_GamePad_LeftThumbstick_RegisterAxisInputMonitor(OnAxisEvent);
-//   OH_GamePad_RightThumbstick_RegisterAxisInputMonitor(OnAxisEvent);
-//   OH_GamePad_LeftTrigger_RegisterAxisInputMonitor(OnAxisEvent);
-//   OH_GamePad_RightTrigger_RegisterAxisInputMonitor(OnAxisEvent);
-//   OH_GamePad_Dpad_RegisterAxisInputMonitor(OnAxisEvent);
+    if (APIAVAILABLE(21, 0, 0)) {
+      OH_GamePad_ButtonA_RegisterButtonInputMonitor(OnButtonEvent);
+      OH_GamePad_ButtonB_RegisterButtonInputMonitor(OnButtonEvent);
+      OH_GamePad_ButtonC_RegisterButtonInputMonitor(OnButtonEvent);
+      OH_GamePad_ButtonX_RegisterButtonInputMonitor(OnButtonEvent);
+      OH_GamePad_ButtonY_RegisterButtonInputMonitor(OnButtonEvent);
+      OH_GamePad_LeftShoulder_RegisterButtonInputMonitor(OnButtonEvent);
+      OH_GamePad_RightShoulder_RegisterButtonInputMonitor(OnButtonEvent);
+      OH_GamePad_LeftTrigger_RegisterButtonInputMonitor(OnButtonEvent);
+      OH_GamePad_RightTrigger_RegisterButtonInputMonitor(OnButtonEvent);
+      OH_GamePad_ButtonHome_RegisterButtonInputMonitor(OnButtonEvent);
+      OH_GamePad_ButtonMenu_RegisterButtonInputMonitor(OnButtonEvent);
+      OH_GamePad_Dpad_UpButton_RegisterButtonInputMonitor(OnButtonEvent);
+      OH_GamePad_Dpad_DownButton_RegisterButtonInputMonitor(OnButtonEvent);
+      OH_GamePad_Dpad_LeftButton_RegisterButtonInputMonitor(OnButtonEvent);
+      OH_GamePad_Dpad_RightButton_RegisterButtonInputMonitor(OnButtonEvent);
+      OH_GamePad_LeftThumbstick_RegisterButtonInputMonitor(OnButtonEvent);
+      OH_GamePad_RightThumbstick_RegisterButtonInputMonitor(OnButtonEvent);
+        
+      OH_GameDevice_RegisterDeviceMonitor(OnDeviceChanged);
+      OH_GamePad_LeftThumbstick_RegisterAxisInputMonitor(OnAxisEvent);
+      OH_GamePad_RightThumbstick_RegisterAxisInputMonitor(OnAxisEvent);
+      OH_GamePad_LeftTrigger_RegisterAxisInputMonitor(OnAxisEvent);
+      OH_GamePad_RightTrigger_RegisterAxisInputMonitor(OnAxisEvent);
+      OH_GamePad_Dpad_RegisterAxisInputMonitor(OnAxisEvent);
+    }
+ 
    return ohos;
 }
 

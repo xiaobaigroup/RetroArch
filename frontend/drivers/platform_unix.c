@@ -67,6 +67,9 @@
 #include <ace/xcomponent/native_interface_xcomponent.h>
 #include "napi/native_api.h"
 #include "hilog/log.h"
+#include "../../menu/menu_cbs.h"
+#include "../../content.h"
+#include "../../tasks/task_content.h"
 #endif
 
 #if defined(DINGUX)
@@ -4064,6 +4067,35 @@ void init_surface(napi_env env, napi_value exports){
    }
    OH_NativeXComponent_RegisterCallback(g_ohos->nativeComponent, &renderCallback);
 }
+
+void ohos_file_load_with_detect_core(const char *filename)
+{
+   /* largely copied from file_load_with_detect_core() in menu_cbs_ok.c */
+   core_info_list_t *list = NULL;
+   const core_info_t *info = NULL;
+   size_t supported = 0;
+
+   if (path_is_compressed_file(filename))
+   {
+      generic_action_ok_displaylist_push(filename, NULL,
+            msg_hash_to_str(MENU_ENUM_LABEL_VALUE_DOWNLOADED_FILE_DETECT_CORE_LIST),
+            FILE_TYPE_CARCHIVE, 0, 0, ACTION_OK_DL_COMPRESSED_ARCHIVE_PUSH_DETECT_CORE);
+      return;
+   }
+
+   core_info_get_list(&list);
+   core_info_list_get_supported_cores(list, filename, &info, &supported);
+   if (supported > 0)
+   {
+      struct menu_state *menu_st          = menu_state_get_ptr();
+      menu_handle_t *menu                 = menu_st->driver_data;
+      strlcpy(menu->deferred_path, filename, sizeof(menu->deferred_path));
+      strlcpy(menu->detect_content_path, filename, sizeof(menu->detect_content_path));
+      generic_action_ok_displaylist_push(filename, NULL, NULL, FILE_TYPE_NONE, 0, 0, ACTION_OK_DL_DEFERRED_CORE_LIST);
+   }
+}
+
+
 static napi_value OpenFile (napi_env env, napi_callback_info info)
 {
    size_t argc = 1;
@@ -4072,7 +4104,13 @@ static napi_value OpenFile (napi_env env, napi_callback_info info)
    size_t str_len;
    char filePath[PATH_MAX_LENGTH];
    napi_get_value_string_utf8(env, args[0],filePath, sizeof(filePath), &str_len);
-   
+   if (filebrowser_get_type() == FILEBROWSER_SCAN_FILE){
+             //action_scan_file(fullpath, NULL, 0, 0);
+   }
+   else
+   {
+      ohos_file_load_with_detect_core(filePath);
+   }
    return NULL;
 }
 

@@ -8151,22 +8151,12 @@ void core_run(void)
       return;
    }
 #endif
-
    if (early_polling)
       input_driver_poll();
    else if (late_polling)
       current_core->flags &= ~RETRO_CORE_FLAG_INPUT_POLLED;
-   struct timespec start, end;
-   long long diff_us;
-    clock_gettime(CLOCK_MONOTONIC, &start);
    current_core->retro_run();
-   clock_gettime(CLOCK_MONOTONIC, &end);
-   diff_us = (end.tv_sec - start.tv_sec) * 1000000LL + 
-           (end.tv_nsec - start.tv_nsec) / 1000LL;
-   if (diff_us > 5000) { // 超过 5ms 才记录
-       double fps = 1000000.0 / diff_us;
-       RARCH_LOG("[PERF] FPS: %.2f\n", fps);
-   }
+
 
 #ifdef HAVE_GAME_AI
    {

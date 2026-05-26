@@ -42,20 +42,20 @@ struct Index {
         .margin(!this.GetOrientation() ?
           { top: RetroState.topRectHeight, bottom: RetroState.bottomRectHeight, left: RetroState.leftAvoidWidth, right: RetroState.rightAvoidWidth} : undefined)
         .onLoad(()=>{ }).onTouch((e: TouchEvent)=>{
-          if(this.viewModel.loading)
-            return;
-          retroApi.onTouchEvent({
-            id: e.touches[e.touches.length - 1]?.id ?? 0,
-            type: e.type,
-            timestamp: e.timestamp,
-            touches: e.touches.map((t)=>{
-              return {
-                id: t.id,
-                x: this.vpToPx(t.x),
-                y: this.vpToPx(t.y)
-              } as TouchObject
-            })
-          })
+            // if(this.viewModel.loading)
+            //   return;
+            // retroApi.onTouchEvent({
+            //   id: e.touches[e.touches.length - 1]?.id ?? 0,
+            //   type: e.type,
+            //   timestamp: e.timestamp,
+            //   touches: e.touches.map((t)=>{
+            //     return {
+            //       id: t.id,
+            //       x: this.vpToPx(t.x),
+            //       y: this.vpToPx(t.y)
+            //     } as TouchObject
+            //   })
+            // })
       }).defaultFocus(true).focusable(true).onKeyEvent((e: KeyEvent)=>{
         retroApi.onKeyEvent(e)
       })

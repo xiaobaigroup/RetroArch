@@ -15,6 +15,7 @@ export const stopApp: () => number;
 export const surfaceChanged: (surfaceId: number, width:number, height:number)=>number;
 export const onTouchEvent: (touch: any)=>number;
 export const onKeyEvent: (touch: any)=>number;
+export const openFile: (filepath: string)=>number;
 export const onNativeEvent: (callback: (eventId: number, value: number)=>void)=> void;
 
 export const sendCtl: (ctl: number) => number;
