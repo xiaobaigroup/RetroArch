@@ -6764,9 +6764,11 @@ static void netplay_announce_nat_traversal(netplay_t *netplay,
    }
    else
    {
+      char buffer[256];
       const char *msg = msg_hash_to_str(MSG_UPNP_FAILED);
-      RARCH_ERR("[Netplay] %s\n", msg);
-      runloop_msg_queue_push(msg, strlen(msg), 1, 180, false, NULL,
+      snprintf(buffer, sizeof(buffer), "%s (status: %d)", msg, net_st->nat_traversal_request.status);
+      RARCH_ERR("[Netplay] %s\n", buffer);
+      runloop_msg_queue_push(buffer, strlen(buffer), 1, 180, false, NULL,
          MESSAGE_QUEUE_ICON_DEFAULT, MESSAGE_QUEUE_CATEGORY_INFO);
    }
 }
