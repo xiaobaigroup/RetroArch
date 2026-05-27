@@ -78,7 +78,6 @@ export class RetroArchViewModel{
                 }catch (e) {
                   console.error("复制文件失败:", e)
                 }
-
               }
               if(await file.isDirectory()){
                 retroApi.openFile(uri.path);
@@ -135,6 +134,7 @@ export class RetroArchViewModel{
     await this.installAssets(dataDir, "assets");
     await this.installAssets(dataDir, "overlays");
     await this.installAssets(dataDir, "info");
+    await this.installAssets(dataDir, "autoconfig");
   }
 
   async installAssets(dataDir: string, name: string){
