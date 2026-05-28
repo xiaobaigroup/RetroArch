@@ -6,6 +6,7 @@ import { KeyCode } from '@kit.InputKit';
 import { RetroArchViewModel, retroArchVM } from '../RetroArchViewModel';
 import window from '@ohos.window';
 import { Xb_ToastUtil } from 'xb_components';
+import { fileIo } from '@kit.CoreFileKit';
 
 class GameXComponentController extends XComponentController{
   onSurfaceCreated(surfaceId: string): void {
@@ -15,6 +16,8 @@ class GameXComponentController extends XComponentController{
     retroApi.surfaceChanged(parseInt(surfaceId), rect.surfaceWidth, rect.surfaceHeight)
   }
   onSurfaceDestroyed(surfaceId: string): void {
+
+
   }
 }
 
@@ -81,6 +84,7 @@ struct Index {
   }
 
   onPageShow(): void {
+    this.getUIContext().getHostContext()?.tempDir
   }
 
   onBackPress(): boolean | void {
