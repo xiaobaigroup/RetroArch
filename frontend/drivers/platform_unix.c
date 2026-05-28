@@ -71,6 +71,7 @@
 #include "../../menu/menu_cbs.h"
 #include "../../content.h"
 #include "../../tasks/task_content.h"
+#include <sys/mman.h>  // mmap, mprotect
 #endif
 
 #if defined(DINGUX)
@@ -3748,6 +3749,25 @@ static enum rarch_display_type frontend_unix_get_display_type(void)
 }
 
 #ifdef __OHOS__
+
+bool jit_available(void){
+    unsigned char code[] = {
+        0xc0, 0x03, 0x5f, 0xd6      // ret                    (返回)
+    };
+    size_t code_size = sizeof(code);
+    void *mem = mmap(NULL, code_size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+    if (mem == MAP_FAILED) {
+        return false;
+    }
+    memcpy(mem, code, code_size);
+    if (mprotect(mem, code_size, PROT_READ | PROT_EXEC) == -1) {
+        munmap(code, code_size);
+        return false;
+    } else {
+       return true;
+    }
+}
+
 typedef struct {
     int event_id; 
     int value;

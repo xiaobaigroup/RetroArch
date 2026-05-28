@@ -42,7 +42,7 @@
 #include <native_window/external_window.h>
 #define PROP_VALUE_MAX 92
 
-
+bool jit_available(void);
 typedef void (*input_keyboard_line_complete_t)(void *userdata, const char *line);
 extern bool ohos_keyboard_start(char **buffer_ptr, size_t *size_ptr, size_t *ptr_ptr,
                                 const char *label,

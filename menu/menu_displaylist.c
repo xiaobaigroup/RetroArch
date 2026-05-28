@@ -2048,7 +2048,7 @@ static unsigned menu_displaylist_parse_system_info(file_list_t *list)
             msg_hash_to_str(MENU_ENUM_LABEL_VALUE_JIT_AVAILABLE),
             sizeof(entry));
       _len           += strlcpy(entry + _len, ": ", sizeof(entry) - _len);
-      if (false)
+      if (jit_available())
          strlcpy(entry + _len, val_yes_str, sizeof(entry) - _len);
       else
          strlcpy(entry + _len, val_no_str,  sizeof(entry) - _len);

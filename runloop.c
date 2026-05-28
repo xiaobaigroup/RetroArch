@@ -21,6 +21,7 @@
 
 #include "ANGLE/GLES2/gl2.h"
 #include "ANGLE/GLES3/gl32.h"
+
 #include "input/input_driver.h"
 #include <stdbool.h>
 #ifdef _WIN32
@@ -242,7 +243,9 @@
 #if TARGET_OS_IPHONE
 #include "JITSupport.h"
 #endif
-
+#ifdef __OHOS__
+#include "frontend/drivers/platform_unix.h"
+#endif
 #if HAVE_GAME_AI
 #include "ai/game_ai.h"
 #endif
@@ -3515,7 +3518,7 @@ bool runloop_environment_cb(unsigned cmd, void *data)
 #if TARGET_OS_IPHONE
             *(bool*)data             = jit_available();
 #elif defined (__OHOS__)
-            *(bool*)data             =  false;
+            *(bool*)data             = jit_available();
 #else
             *(bool*)data             = true;
 #endif
