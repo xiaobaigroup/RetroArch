@@ -211,6 +211,73 @@ void ohos_input_poll_button_event(
          break;
    }
 }
+void ohos_input_poll_native_key_event(
+    void  *ohos_input, struct OH_NativeXComponent_KeyEvent *event)
+{
+   int64_t deviceId = 0;
+   OH_NativeXComponent_KeyCode keycode;
+   OH_NativeXComponent_KeyAction action;
+   uint64_t meta= 0;
+   bool isNumLockOn;
+   bool isCapsLockOn;
+   bool isScrollLockOn;
+   OH_NativeXComponent_GetKeyEventDeviceId(event, &deviceId);
+   OH_NativeXComponent_GetKeyEventCode(event, &keycode);
+   OH_NativeXComponent_GetKeyEventAction(event, &action);
+   OH_NativeXComponent_GetKeyEventModifierKeyStates(event, &meta);
+    
+   OH_NativeXComponent_GetKeyEventNumLockState(event, &isNumLockOn);
+   OH_NativeXComponent_GetKeyEventCapsLockState(event, &isNumLockOn);
+   OH_NativeXComponent_GetKeyEventScrollLockState(event, &isScrollLockOn);
+
+   int keydown           = (action == OH_NATIVEXCOMPONENT_KEY_ACTION_DOWN);
+   uint16_t mod          = 0;
+   unsigned keyboardcode = input_keymaps_translate_keysym_to_rk(keycode);
+    
+   input_keyboard_event(keydown, keyboardcode,
+      keyboardcode, mod, RETRO_DEVICE_KEYBOARD);
+   uint8_t *buf = ohos_key_state[OHOS_KEYBOARD_PORT];
+    
+   if (meta == 1)
+      mod |= RETROKMOD_CTRL;
+   if (meta == 2)
+      mod |= RETROKMOD_SHIFT;
+   if (meta == 4)
+      mod |= RETROKMOD_ALT;
+   if (isNumLockOn)
+      mod |= RETROKMOD_SCROLLOCK;
+   if (isCapsLockOn)
+      mod |= RETROKMOD_CAPSLOCK;
+   if(isNumLockOn)
+      mod |= RETROKMOD_SCROLLOCK;
+   //   if (meta & AMETA_META_ON)
+   //      mod |= RETROKMOD_META;
+    
+   int keysym  = keycode;
+   /* Handle 'duplicate' inputs that correspond
+    * to the same RETROK_* key */
+   switch (keycode)
+   {
+      case KEYCODE_DPAD_CENTER:
+         keysym = KEYCODE_ENTER;
+      default:
+         break;
+   }
+   /* some controllers send both the up and down events at once
+    * when the button is released for "special" buttons, like menu buttons
+    * work around that by only using down events for meta keys (which get
+    * cleared every poll anyway)
+    */
+   switch (action)
+   {
+      case OH_NATIVEXCOMPONENT_KEY_ACTION_UP:
+         BIT_CLEAR(buf, keysym);
+         break;
+      case OH_NATIVEXCOMPONENT_KEY_ACTION_DOWN:
+         BIT_SET(buf, keysym);
+         break;
+   }
+}
 void ohos_input_poll_key_event(
     void  *ohos_input, KeyEvent *event)
 {
@@ -448,7 +515,7 @@ static void *ohos_input_init(const char *joypad_driver)
             rate = DEFAULT_ASENSOR_EVENT_RATE;
       }
    }
-    if (APIAVAILABLE(21, 0, 0)) {
+   if (APIAVAILABLE(21, 0, 0)) {
       OH_GamePad_ButtonA_RegisterButtonInputMonitor(OnButtonEvent);
       OH_GamePad_ButtonB_RegisterButtonInputMonitor(OnButtonEvent);
       OH_GamePad_ButtonC_RegisterButtonInputMonitor(OnButtonEvent);
@@ -473,7 +540,7 @@ static void *ohos_input_init(const char *joypad_driver)
       OH_GamePad_LeftTrigger_RegisterAxisInputMonitor(OnAxisEvent);
       OH_GamePad_RightTrigger_RegisterAxisInputMonitor(OnAxisEvent);
       OH_GamePad_Dpad_RegisterAxisInputMonitor(OnAxisEvent);
-    }
+   }
  
    return ohos;
 }

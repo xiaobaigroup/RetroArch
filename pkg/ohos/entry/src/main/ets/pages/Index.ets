@@ -44,24 +44,9 @@ struct Index {
         // .aspectRatio(!this.viewModel.fullScreen ? this.GetAspectRatio(): undefined)
         .margin(!this.GetOrientation() ?
           { top: RetroState.topRectHeight, bottom: RetroState.bottomRectHeight, left: RetroState.leftAvoidWidth, right: RetroState.rightAvoidWidth} : undefined)
-        .onLoad(()=>{ }).onTouch((e: TouchEvent)=>{
-            // if(this.viewModel.loading)
-            //   return;
-            // retroApi.onTouchEvent({
-            //   id: e.touches[e.touches.length - 1]?.id ?? 0,
-            //   type: e.type,
-            //   timestamp: e.timestamp,
-            //   touches: e.touches.map((t)=>{
-            //     return {
-            //       id: t.id,
-            //       x: this.vpToPx(t.x),
-            //       y: this.vpToPx(t.y)
-            //     } as TouchObject
-            //   })
-            // })
-      }).defaultFocus(true).focusable(true).onKeyEvent((e: KeyEvent)=>{
-        retroApi.onKeyEvent(e)
-      })
+        .onLoad(()=>{ })
+        .defaultFocus(true).focusable(true).focusOnTouch(true)
+
       if (this.viewModel.loading) {
         Row () {
           Text("加载资源中").fontColor(Color.White)
@@ -72,6 +57,7 @@ struct Index {
     .width('100%')
     .foregroundBlurStyle(RetroState.showBlur ? BlurStyle.BACKGROUND_THIN : BlurStyle.NONE,
       { colorMode: ThemeColorMode.SYSTEM, adaptiveColor: AdaptiveColor.DEFAULT, scale: 0.3 })
+
   }
 
   public vpToPx(vp: number) {

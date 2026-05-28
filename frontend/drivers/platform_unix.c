@@ -3753,7 +3753,10 @@ typedef struct {
     int value;
 } NativeEventData;    
 void ohos_input_poll_touch_event(void* ohos_input, OH_NativeXComponent_TouchEvent data);
+
+void ohos_input_poll_native_key_event(void* ohos_input, struct OH_NativeXComponent_KeyEvent* data);
 void ohos_input_poll_key_event(void* ohos_input, KeyEvent* data);
+
 bool ohos_keyboard_start(char **buffer_ptr, size_t *size_ptr, size_t *ptr_ptr,
                                 const char *label,
                                 input_keyboard_line_complete_t callback, void *userdata){
@@ -3833,8 +3836,8 @@ static napi_value StartApp(napi_env env, napi_callback_info info)
      napi_get_value_string_utf8(env, name_value, params.LIBRETRO, sizeof(params.LIBRETRO), &str_len);
    }
    if (napi_get_named_property(env, args[0], "Lang", &name_value) == napi_ok) {
-     size_t str_len;
-     napi_get_value_string_utf8(env, name_value, params.Lang, sizeof(params.Lang), &str_len);
+      size_t str_len;
+      napi_get_value_string_utf8(env, name_value, params.Lang, sizeof(params.Lang), &str_len);
    }
    if (napi_get_named_property(env, args[0], "Dpi", &name_value) == napi_ok) {
       napi_get_value_int32(env, name_value, &params.DPI);
@@ -4024,6 +4027,16 @@ static void DispatchTouchEventCB(OH_NativeXComponent *component, void *window)
    OH_NativeXComponent_GetTouchEvent(component,window, &touchEvent);
    ohos_input_poll_touch_event(g_ohos->ohos_input, touchEvent);
 }
+static void DispatchKeyEventCB(OH_NativeXComponent *component, void *window)
+{
+   if ((NULL == component) || (NULL == window)) {
+     return;
+   }
+   struct OH_NativeXComponent_KeyEvent* event;
+   OH_NativeXComponent_GetKeyEvent(component, &event);
+   ohos_input_poll_native_key_event(g_ohos->ohos_input, event);
+}
+
 static napi_value SurfaceChanged(napi_env env, napi_callback_info info)
 {
    size_t argc = 3;
@@ -4067,6 +4080,7 @@ void init_surface(napi_env env, napi_value exports){
         return;
    }
    OH_NativeXComponent_RegisterCallback(g_ohos->nativeComponent, &renderCallback);
+   OH_NativeXComponent_RegisterKeyEventCallback(g_ohos->nativeComponent, DispatchKeyEventCB);
 }
 
 void ohos_file_load_with_detect_core(const char *filename)
@@ -4106,7 +4120,7 @@ static napi_value OpenFile (napi_env env, napi_callback_info info)
    char filePath[PATH_MAX_LENGTH];
    napi_get_value_string_utf8(env, args[0],filePath, sizeof(filePath), &str_len);
    if (filebrowser_get_type() == FILEBROWSER_SCAN_FILE){
-             //action_scan_file(fullpath, NULL, 0, 0);
+       //action_scan_file(fullpath, NULL, 0, 0);
    }
    else
    {
