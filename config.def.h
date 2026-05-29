@@ -1033,8 +1033,11 @@
 #else
 #define DEFAULT_ALL_USERS_CONTROL_MENU false
 #endif
-
+#ifdef __OHOS__
+#define DEFAULT_CONFIRM_QUIT false
+#else
 #define DEFAULT_CONFIRM_QUIT true
+#endif
 #define DEFAULT_CONFIRM_CLOSE true
 #define DEFAULT_CONFIRM_RESET true
 

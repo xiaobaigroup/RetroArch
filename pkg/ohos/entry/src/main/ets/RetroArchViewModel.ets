@@ -140,7 +140,6 @@ export class RetroArchViewModel{
     }catch (e) {
       console.error("替换icon失败", e)
     }
-
   }
   async overrideIcons(dataDir: string){
     await this.overrideIcon(dataDir, "/glui/cores.png");
