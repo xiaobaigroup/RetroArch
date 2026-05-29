@@ -2,11 +2,11 @@
   "string": [
     {
       "name": "module_desc",
-      "value": "RetroArch by HarmonyOS"
+      "value": "GameBox by HarmonyOS"
     },
     {
       "name": "EntryAbility_desc",
-      "value": "RetroArch by HarmonyOS"
+      "value": "GameBox by HarmonyOS"
     },
     {
       "name": "EntryAbility_label",

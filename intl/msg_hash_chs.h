@@ -221,7 +221,7 @@ MSG_HASH(
    )
 MSG_HASH(
    MENU_ENUM_SUBLABEL_RESTART_RETROARCH,
-   "重启 RetroArch 应用程序。"
+   "重启 全能模拟器 应用程序。"
    )
 MSG_HASH(
    MENU_ENUM_LABEL_VALUE_QUIT_RETROARCH,
@@ -229,15 +229,15 @@ MSG_HASH(
    )
 MSG_HASH(
    MENU_ENUM_SUBLABEL_QUIT_RETROARCH,
-   "退出RetroArch应用。[退出时配置保存] 已启用。"
+   "退出 全能模拟器 应用。[退出时配置保存] 已启用。"
    )
 MSG_HASH(
    MENU_ENUM_SUBLABEL_QUIT_RETROARCH_NOSAVE,
-   "退出RetroArch应用。[退出时配置保存] 已禁用。"
+   "退出 全能模拟器 应用。[退出时配置保存] 已禁用。"
    )
 MSG_HASH(
    MENU_ENUM_LABEL_HELP_QUIT_RETROARCH,
-   "退出 RetroArch。以任何强制方式终止程序（如 SIGKILL 等）均不会保存配置。在类 Unix 系统上，使用 SIGINT 或 SIGTERM 信号可触发正常退出流程，若已启用配置自动保存，则会在退出时保存配置。"
+   "退出 全能模拟器。以任何强制方式终止程序（如 SIGKILL 等）均不会保存配置。在类 Unix 系统上，使用 SIGINT 或 SIGTERM 信号可触发正常退出流程，若已启用配置自动保存，则会在退出时保存配置。"
    )
 MSG_HASH(
    MENU_ENUM_LABEL_VALUE_CLOUD_SYNC_SYNC_NOW,
@@ -642,7 +642,7 @@ MSG_HASH(
    )
 MSG_HASH(
    MENU_ENUM_LABEL_VALUE_SYSTEM_INFO_RETROARCH_VERSION,
-   "RetroArch 版本"
+   "全能模拟器 版本"
    )
 MSG_HASH(
    MENU_ENUM_LABEL_VALUE_SYSTEM_INFO_GIT_VERSION,
@@ -1088,7 +1088,7 @@ MSG_HASH(
    )
 MSG_HASH(
    MENU_ENUM_SUBLABEL_CLOUD_SYNC_SYNC_MODE,
-   "自动同步：在RetroArch启动时及核心卸载时进行同步。 手动同步：仅在手动触发“立即同步”按钮时执行同步。"
+   "自动同步：在 全能模拟器 启动时及核心卸载时进行同步。 手动同步：仅在手动触发“立即同步”按钮时执行同步。"
    )
 MSG_HASH(
    MENU_ENUM_LABEL_VALUE_CLOUD_SYNC_SYNC_MODE_AUTOMATIC,
@@ -1220,7 +1220,7 @@ MSG_HASH(
    )
 MSG_HASH(
    MENU_ENUM_LABEL_HELP_FILE_BROWSER_CORE,
-   "Libretro 核心。选择后 RetroArch 将加载此核心。"
+   "Libretro 核心。选择后 全能模拟器 将加载此核心。"
    )
 MSG_HASH(
    MENU_ENUM_LABEL_HELP_FILE_BROWSER_DIRECTORY,
@@ -1667,19 +1667,19 @@ MSG_HASH(
    )
 MSG_HASH(
    MENU_ENUM_LABEL_HELP_MENU_DRIVER_XMB,
-   "XMB 是 RetroArch 的一个 GUI，看起来像第 7 世代主机菜单。它可以支持与 Ozone 相同的功能。"
+   "XMB 是 全能模拟器 的一个 GUI，看起来像第 7 世代主机菜单。它可以支持与 Ozone 相同的功能。"
    )
 MSG_HASH(
    MENU_ENUM_LABEL_HELP_MENU_DRIVER_OZONE,
-   "Ozone 是大多数平台上 RetroArch 的默认 GUI。它针对游戏控制器的导航进行了优化。"
+   "Ozone 是大多数平台上 全能模拟器 的默认 GUI。它针对游戏控制器的导航进行了优化。"
    )
 MSG_HASH(
    MENU_ENUM_LABEL_HELP_MENU_DRIVER_RGUI,
-   "RGUI 是 RetroArch 的内置简单 GUI。它在菜单驱动程序中的性能要求最低，并且可以在低分辨率屏幕上使用。"
+   "RGUI 是 全能模拟器 的内置简单 GUI。它在菜单驱动程序中的性能要求最低，并且可以在低分辨率屏幕上使用。"
    )
 MSG_HASH(
    MENU_ENUM_LABEL_HELP_MENU_DRIVER_MATERIALUI,
-   "在移动设备上，RetroArch 默认使用移动端 UI，MaterialUI。该界面是围绕触摸屏和指针设备（例如鼠标/轨迹球）设计的。"
+   "在移动设备上，全能模拟器 默认使用移动端 UI，MaterialUI。该界面是围绕触摸屏和指针设备（例如鼠标/轨迹球）设计的。"
    )
 MSG_HASH(
    MENU_ENUM_LABEL_VALUE_RECORD_DRIVER,
@@ -1984,7 +1984,7 @@ MSG_HASH(
    )
 MSG_HASH(
    MENU_ENUM_LABEL_HELP_VIDEO_MONITOR_INDEX,
-   "指定优先使用的显示器。0（默认）表示不偏好任何特定显示器；1 及以上数值（1 代表第一台显示器）将建议 RetroArch 使用该显示器。"
+   "指定优先使用的显示器。0（默认）表示不偏好任何特定显示器；1 及以上数值（1 代表第一台显示器）将建议 全能模拟器 使用该显示器。"
    )
 #if defined (WIIU)
 MSG_HASH(
@@ -2194,7 +2194,7 @@ MSG_HASH(
    )
 MSG_HASH(
    MENU_ENUM_SUBLABEL_VIDEO_WINDOW_SAVE_POSITION,
-   "以“窗口宽度”和“窗口高度”所指定的固定尺寸显示所有内容，并在关闭 RetroArch 时保存当前窗口的大小与位置。禁用时，窗口尺寸将根据“窗口缩放比例”（Windowed Scale）动态设定。"
+   "以“窗口宽度”和“窗口高度”所指定的固定尺寸显示所有内容，并在关闭 全能模拟器 时保存当前窗口的大小与位置。禁用时，窗口尺寸将根据“窗口缩放比例”（Windowed Scale）动态设定。"
    )
 MSG_HASH(
    MENU_ENUM_LABEL_VALUE_VIDEO_WINDOW_CUSTOM_SIZE_ENABLE,
@@ -2767,7 +2767,7 @@ MSG_HASH(
    )
 MSG_HASH(
    MENU_ENUM_SUBLABEL_MICROPHONE_WASAPI_EXCLUSIVE_MODE,
-   "当使用WASAPI麦克风驱动时，允许RetroArch对麦克风设备进行独占控制。如果禁用，RetroArch将使用共享模式代替。"
+   "当使用WASAPI麦克风驱动时，允许 全能模拟器 对麦克风设备进行独占控制。如果禁用， 全能模拟器 将使用共享模式代替。"
    )
 MSG_HASH(
    MENU_ENUM_LABEL_VALUE_MICROPHONE_WASAPI_FLOAT_FORMAT,
@@ -3002,7 +3002,7 @@ MSG_HASH(
    )
 MSG_HASH(
    MENU_ENUM_LABEL_HELP_INPUT_POLL_TYPE_BEHAVIOR,
-   "影响 RetroArch 内部输入轮询的时机。\n提前（Early）：在帧处理前执行输入轮询。\n正常（Normal）：在请求轮询时执行输入轮询。\n延后（Late）：在每帧首次请求输入状态时执行输入轮询。\n根据你的配置，将此项设为“提前”或“延后”可能降低输入延迟。启用网络联机（Netplay）将忽略。"
+   "影响 全能模拟器 内部输入轮询的时机。\n提前（Early）：在帧处理前执行输入轮询。\n正常（Normal）：在请求轮询时执行输入轮询。\n延后（Late）：在每帧首次请求输入状态时执行输入轮询。\n根据你的配置，将此项设为“提前”或“延后”可能降低输入延迟。启用网络联机（Netplay）将忽略。"
    )
 MSG_HASH(
    MENU_ENUM_LABEL_VALUE_INPUT_REMAP_BINDS_ENABLE,
@@ -3049,7 +3049,7 @@ MSG_HASH(
    )
 MSG_HASH(
    MENU_ENUM_LABEL_HELP_INPUT_SELECT_PHYSICAL_KEYBOARD,
-   "若 RetroArch 将硬件键盘误识别为某种游戏手柄，可启用此设置强制将其视为键盘。\n当你在安卓电视设备上模拟电脑系统，且连接了外接物理键盘时，此功能尤其有用。"
+   "若 全能模拟器 将硬件键盘误识别为某种游戏手柄，可启用此设置强制将其视为键盘。\n当你在安卓电视设备上模拟电脑系统，且连接了外接物理键盘时，此功能尤其有用。"
    )
 #endif
 MSG_HASH(
@@ -3303,7 +3303,7 @@ MSG_HASH(
    )
 MSG_HASH(
    MENU_ENUM_LABEL_HELP_INPUT_RETROPAD_BINDS,
-   "Libretro 使用一个名叫“全能手柄 (RetroPad)”的虚拟抽像手柄，在前端 (例如 RetroArch) 和核心之间通讯。 此菜单决定虚拟的全能手柄 (RetroPad) 如何映射到物理输入设备以及这些设备使用的虚拟输入端口。\n如果物理输入设备被正确地识别并自动配置，用户可能根本不需要使用此菜单。对于核心特定的输入配置更改，请使用快速菜单的“控制”子菜单。"
+   "Libretro 使用一个名叫“全能手柄 (RetroPad)”的虚拟抽像手柄，在前端 (例如 全能模拟器) 和核心之间通讯。 此菜单决定虚拟的全能手柄 (RetroPad) 如何映射到物理输入设备以及这些设备使用的虚拟输入端口。\n如果物理输入设备被正确地识别并自动配置，用户可能根本不需要使用此菜单。对于核心特定的输入配置更改，请使用快速菜单的“控制”子菜单。"
    )
 MSG_HASH(
    MENU_ENUM_LABEL_VALUE_INPUT_USER_BINDS,
@@ -3489,7 +3489,7 @@ MSG_HASH(
    )
 MSG_HASH(
    MENU_ENUM_SUBLABEL_INPUT_QUIT_GAMEPAD_COMBO,
-   "退出RetroArch的控制器組合鍵"
+   "退出全能模拟器 的控制器組合鍵"
    )
 MSG_HASH(
    MENU_ENUM_LABEL_VALUE_INPUT_META_QUIT_KEY,
@@ -3965,7 +3965,7 @@ MSG_HASH(
    )
 MSG_HASH(
    MENU_ENUM_SUBLABEL_INPUT_DEVICE_INDEX,
-   "RetroArch识别的物理控制器。"
+   "全能模拟器 识别的物理控制器。"
    )
 MSG_HASH(
    MENU_ENUM_SUBLABEL_INPUT_DEVICE_RESERVED_DEVICE_NAME,
@@ -4029,7 +4029,7 @@ MSG_HASH(
    )
 MSG_HASH(
    MENU_ENUM_SUBLABEL_INPUT_MOUSE_INDEX,
-   "RetroArch识别的物理鼠标。"
+   "全能模拟器 识别的物理鼠标。"
    )
 MSG_HASH(
    MENU_ENUM_LABEL_VALUE_INPUT_JOYPAD_B,
@@ -4269,7 +4269,7 @@ MSG_HASH(
    )
 MSG_HASH(
    MENU_ENUM_LABEL_HELP_DUMMY_ON_CORE_SHUTDOWN,
-   "某些核心可能具备关机功能。若此选项保持禁用，执行关机操作将导致 RetroArch 退出。\n启用此选项后，系统会加载一个虚拟核心，使 RetroArch 保留在菜单中，而不会关闭程序。"
+   "某些核心可能具备关机功能。若此选项保持禁用，执行关机操作将导致 全能模拟器 退出。\n启用此选项后，系统会加载一个虚拟核心，使 全能模拟器 保留在菜单中，而不会关闭程序。"
    )
 MSG_HASH(
    MENU_ENUM_LABEL_VALUE_CORE_SET_SUPPORTS_NO_CONTENT_ENABLE,
@@ -4362,7 +4362,7 @@ MSG_HASH(
 
 MSG_HASH(
    MSG_CORE_STEAM_UNINSTALLED,
-   "退出 RetroArch 时，该核心将被卸载。"
+   "退出 全能模拟器 时，该核心将被卸载。"
 )
 
 MSG_HASH(
@@ -4390,7 +4390,7 @@ MSG_HASH(
    )
 MSG_HASH(
    MENU_ENUM_SUBLABEL_REMAP_SAVE_ON_EXIT,
-   "关闭内容或退出RetroArch时，将更改保存到任何活动的输入重新映射文件。"
+   "关闭内容或退出 全能模拟器 时，将更改保存到任何活动的输入重新映射文件。"
    )
 MSG_HASH(
    MENU_ENUM_LABEL_VALUE_GAME_SPECIFIC_OPTIONS,
@@ -4694,7 +4694,7 @@ MSG_HASH(
    )
 MSG_HASH(
    MENU_ENUM_LABEL_HELP_FASTFORWARD_RATIO,
-   "使用快进功能时，内容运行的最高帧率上限。（例如：对于 60 fps 的内容，设为 5.0 表示最高 300 fps。）\nRetroArch 会主动休眠以确保不超过此上限。请注意：此限制并非绝对精确，请勿依赖其作为严格基准。"
+   "使用快进功能时，内容运行的最高帧率上限。（例如：对于 60 fps 的内容，设为 5.0 表示最高 300 fps。）\n全能模拟器 会主动休眠以确保不超过此上限。请注意：此限制并非绝对精确，请勿依赖其作为严格基准。"
    )
 MSG_HASH(
    MENU_ENUM_LABEL_VALUE_FASTFORWARD_FRAMESKIP,
@@ -5731,7 +5731,7 @@ MSG_HASH(
    )
 MSG_HASH(
    MENU_ENUM_SUBLABEL_QUIT_ON_CLOSE_CONTENT,
-   "于关闭游戏时自动退出 RetroArch。设置为「CLI」表示随由命令行启动的游戏退出而退出。"
+   "于关闭游戏时自动退出 全能模拟器。设置为「CLI」表示随由命令行启动的游戏退出而退出。"
    )
 MSG_HASH(
    MENU_ENUM_LABEL_VALUE_MENU_SAVESTATE_RESUME,
@@ -7594,7 +7594,7 @@ MSG_HASH(
    )
 MSG_HASH(
    MENU_ENUM_SUBLABEL_PLAYLIST_ALLOW_NON_PNG,
-   "如果启用，本地缩略图可以添加到RetroArch支持的所有图像类型(例如jpeg)。可能会产生较小的性能影响。"
+   "如果启用，本地缩略图可以添加到 全能模拟器 支持的所有图像类型(例如jpeg)。可能会产生较小的性能影响。"
    )
 MSG_HASH(
    MENU_ENUM_LABEL_VALUE_MANAGE,
@@ -7692,7 +7692,7 @@ MSG_HASH(
    )
 MSG_HASH(
    MENU_ENUM_LABEL_HELP_USER_LANGUAGE,
-   "根据此处选择的语言，本地化菜单及所有屏幕提示信息。更改需重启 RetroArch 方可生效。\n各语言选项旁会显示其翻译完整度。若某菜单项尚未提供所选语言的翻译，则回退显示英文。"
+   "根据此处选择的语言，本地化菜单及所有屏幕提示信息。更改需重启 全能模拟器 方可生效。\n各语言选项旁会显示其翻译完整度。若某菜单项尚未提供所选语言的翻译，则回退显示英文。"
    )
 
 /* Settings > User > Privacy */
@@ -7730,7 +7730,7 @@ MSG_HASH(
    )
 MSG_HASH(
    MENU_ENUM_LABEL_HELP_ACCOUNTS_RETRO_ACHIEVEMENTS,
-   "用于登录您的 RetroAchievements 账户。请访问 retroachievements.org 免费注册账户。\n注册完成后，需在 RetroArch 中输入您的用户名和密码。"
+   "用于登录您的 RetroAchievements 账户。请访问 retroachievements.org 免费注册账户。\n注册完成后，需在 全能模拟器 中输入您的用户名和密码。"
    )
 MSG_HASH(
    MENU_ENUM_LABEL_VALUE_ACCOUNTS_YOUTUBE,
@@ -8061,7 +8061,7 @@ MSG_HASH(
    )
 MSG_HASH(
    MENU_ENUM_SUBLABEL_STEAM_RICH_PRESENCE_ENABLE,
-   "在Steam上的RetroArch中分享您当前的状态。"
+   "在Steam上的 全能模拟器 中分享您当前的状态。"
    )
 
 MSG_HASH(
@@ -9462,7 +9462,7 @@ MSG_HASH(
    )
 MSG_HASH(
    MENU_ENUM_LABEL_HELP_SHADER_APPLY_CHANGES,
-   "修改着色器设置（如着色器通道数、滤镜、FBO 缩放等）\n此类操作开销较大，因此需手动触发。\n应用后，设置将保存至临时文件（如 retroarch.slangp/.cgp/.glslp）并加载。该文件在 RetroArch 退出后仍会保留，并存储于着色器目录中。"
+   "修改着色器设置（如着色器通道数、滤镜、FBO 缩放等）\n此类操作开销较大，因此需手动触发。\n应用后，设置将保存至临时文件（如 retroarch.slangp/.cgp/.glslp）并加载。该文件在 全能模拟器 退出后仍会保留，并存储于着色器目录中。"
    )
 MSG_HASH(
    MENU_ENUM_LABEL_VALUE_VIDEO_SHADER_PARAMETERS,
@@ -9482,7 +9482,7 @@ MSG_HASH(
    )
 MSG_HASH(
    MENU_ENUM_LABEL_HELP_VIDEO_SHADER_NUM_PASSES,
-   "RetroArch 支持任意组合多个着色器通道，搭配自定义硬件滤镜与缩放倍率。\n此选项指定使用的着色器通道数量。若设为 0 并应用更改，则使用“空白”着色器。"
+   "全能模拟器 支持任意组合多个着色器通道，搭配自定义硬件滤镜与缩放倍率。\n此选项指定使用的着色器通道数量。若设为 0 并应用更改，则使用“空白”着色器。"
    )
 MSG_HASH(
    MENU_ENUM_LABEL_VALUE_SHADER,
@@ -12306,7 +12306,7 @@ MSG_HASH(
    )
 MSG_HASH(
    MENU_ENUM_LABEL_HELP_LOAD_CONTENT_HISTORY,
-   "加载内容时，所使用的内容与 libretro 核心的组合将被保存到历史记录中。\n历史记录会保存在 RetroArch 配置文件所在的同一目录下。如果启动时未加载配置文件，则不会保存或加载历史记录，主菜单中也不会显示历史项。"
+   "加载内容时，所使用的内容与 libretro 核心的组合将被保存到历史记录中。\n历史记录会保存在 全能模拟器 配置文件所在的同一目录下。如果启动时未加载配置文件，则不会保存或加载历史记录，主菜单中也不会显示历史项。"
    )
 MSG_HASH(
    MENU_ENUM_LABEL_VALUE_MULTIMEDIA_SETTINGS,
@@ -12644,7 +12644,7 @@ MSG_HASH(
    )
 MSG_HASH(
    MSG_NETPLAY_OUT_OF_DATE,
-   "网络播放节点正在运行旧版本的RetroArch。无法连接。"
+   "网络播放节点正在运行旧版本的 全能模拟器 。无法连接。"
    )
 MSG_HASH(
    MSG_NETPLAY_DIFFERENT_VERSIONS,
@@ -14233,7 +14233,7 @@ MSG_HASH(
 )
 MSG_HASH(
    MSG_CHEEVOS_UNSUPPORTED_WARNING,
-   "检测到不支持的成就功能。请尝试更换核心或更新 RetroArch。"
+   "检测到不支持的成就功能。请尝试更换核心或更新 全能模拟器。"
 )
 MSG_HASH(
    MSG_CHEEVOS_RICH_PRESENCE_SPECTATING,
@@ -15236,7 +15236,7 @@ MSG_HASH(
    )
 MSG_HASH(
    MSG_ACCESSIBILITY_STARTUP,
-   "RetroArch检查开启。主菜单加载核心。"
+   "全能模拟器 检查开启。主菜单加载核心。"
    )
 MSG_HASH(
    MSG_AI_SERVICE_STOPPED,
