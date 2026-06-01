@@ -2177,10 +2177,12 @@ static void frontend_unix_get_env(int *argc,
     *
     * */
 
-   g_defaults.settings_video_refresh_rate =  120.0;
+   g_defaults.settings_video_refresh_rate =  59.0;
    g_defaults.overlay_set    = true;
    g_defaults.overlay_enable = true;
-   strlcpy(g_defaults.settings_menu, "glui", sizeof(g_defaults.settings_menu));
+   strlcpy(g_defaults.settings_menu, "xmb", sizeof(g_defaults.settings_menu));
+   g_defaults.menu_materialui_menu_color_theme_enable = true;
+   g_defaults.menu_materialui_menu_color_theme =  MATERIALUI_THEME_GRAY_LIGHT;
 #else
    char base_path[PATH_MAX] = {0};
 #if defined(RARCH_UNIX_CWD_ENV)

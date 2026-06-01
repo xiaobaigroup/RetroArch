@@ -54,7 +54,7 @@ export default class EntryAbility extends UIAbility {
     // Main window is created, set main page for this ability
     hilog.info(DOMAIN, 'testTag', '%{public}s', 'Ability onWindowStageCreate');
     const mainWindow = windowStage.getMainWindowSync();
-    mainWindow.setPreferredOrientation(window.Orientation.AUTO_ROTATION_UNSPECIFIED);
+    mainWindow.setPreferredOrientation(window.Orientation.AUTO_ROTATION_LANDSCAPE_RESTRICTED);
     mainWindow.setWindowSystemBarEnable([]);
     await mainWindow.setWindowLayoutFullScreen(true);
     windowStage.loadContent('pages/Index', async (err) => {

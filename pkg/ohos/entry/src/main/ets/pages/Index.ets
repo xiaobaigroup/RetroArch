@@ -6,7 +6,6 @@ import { KeyCode } from '@kit.InputKit';
 import { RetroArchViewModel, retroArchVM } from '../RetroArchViewModel';
 import window from '@ohos.window';
 import { Xb_ToastUtil } from 'xb_components';
-import { fileIo } from '@kit.CoreFileKit';
 
 class GameXComponentController extends XComponentController{
   onSurfaceCreated(surfaceId: string): void {
@@ -36,7 +35,7 @@ struct Index {
   }
   build() {
     Stack() {
-      XComponent({id:"game", type: XComponentType.TEXTURE,libraryname: "retroarch", controller: this.xController})
+      XComponent({id:"game", type: XComponentType.SURFACE, libraryname: "retroarch", controller: this.xController})
         .backgroundColor(Color.Black)
         .width('100%')
         .height('100%')

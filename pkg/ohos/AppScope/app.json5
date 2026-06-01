@@ -1,6 +1,6 @@
 {
   "app": {
-    "bundleName": "org.xbstudio.retroarch",
+    "bundleName": "org.xbstudio.gamebox",
     "vendor": "example",
     "versionCode": 1022000,
     "versionName": "1.22.0",

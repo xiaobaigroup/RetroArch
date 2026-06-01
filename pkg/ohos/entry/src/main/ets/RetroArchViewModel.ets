@@ -102,9 +102,9 @@ export class RetroArchViewModel{
     })
   }
   async StartApp(){
-    this.dataDir = (await initDownloadDir(this.context!) ?? this.context!.filesDir) + "/RetroArch"
+    this.dataDir = (await initDownloadDir(this.context!) ?? this.context!.filesDir) + "/GameBox"
     let dataDir = this.dataDir;
-    let configPath = dataDir + "/retroarch.cfg";
+    let configPath = dataDir + "/gamebox.cfg";
     try {
       if (!await fileIo.access(dataDir))
         await fileIo.mkdir(dataDir)
