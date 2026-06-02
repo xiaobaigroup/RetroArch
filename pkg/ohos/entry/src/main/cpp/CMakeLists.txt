@@ -32,6 +32,7 @@ set(HAVE_FILE_LOGGER 1)
 set(HAVE_GFX_WIDGETS 1)
 set(HAVE_SAF 1)
 set(HAVE_BUILTINSMBCLIENT 1)
+set(HAVE_NETWORKING 0)
 
 # 基础定义
 add_definitions(
