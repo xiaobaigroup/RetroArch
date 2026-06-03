@@ -6429,11 +6429,11 @@ bool menu_displaylist_process(menu_displaylist_info_t *info)
             MENU_SETTING_ACTION, 0, 0, NULL);
 #endif
 #if defined(HAVE_NETWORKING) && defined(HAVE_NETWORKGAMEPAD)
-      menu_entries_append(info_list,
-            msg_hash_to_str(MENU_ENUM_LABEL_VALUE_START_NET_RETROPAD),
-            MENU_ENUM_LABEL_START_NET_RETROPAD_STR,
-            MENU_ENUM_LABEL_START_NET_RETROPAD,
-            MENU_SETTING_ACTION, 0, 0, NULL);
+//      menu_entries_append(info_list,
+//            msg_hash_to_str(MENU_ENUM_LABEL_VALUE_START_NET_RETROPAD),
+//            MENU_ENUM_LABEL_START_NET_RETROPAD_STR,
+//            MENU_ENUM_LABEL_START_NET_RETROPAD,
+//            MENU_SETTING_ACTION, 0, 0, NULL);
 #endif
    }
 

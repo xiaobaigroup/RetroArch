@@ -17177,7 +17177,7 @@ static bool setting_append_list(
                &settings->bools.vrr_runloop_enable,
                MENU_ENUM_LABEL_VRR_RUNLOOP_ENABLE,
                MENU_ENUM_LABEL_VALUE_VRR_RUNLOOP_ENABLE,
-               false,
+               true,
                MENU_ENUM_LABEL_VALUE_OFF,
                MENU_ENUM_LABEL_VALUE_ON,
                &group_info,
