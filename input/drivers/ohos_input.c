@@ -227,7 +227,7 @@ void ohos_input_poll_native_key_event(
    OH_NativeXComponent_GetKeyEventModifierKeyStates(event, &meta);
     
    OH_NativeXComponent_GetKeyEventNumLockState(event, &isNumLockOn);
-   OH_NativeXComponent_GetKeyEventCapsLockState(event, &isNumLockOn);
+   OH_NativeXComponent_GetKeyEventCapsLockState(event, &isCapsLockOn);
    OH_NativeXComponent_GetKeyEventScrollLockState(event, &isScrollLockOn);
 
    int keydown           = (action == OH_NATIVEXCOMPONENT_KEY_ACTION_DOWN);

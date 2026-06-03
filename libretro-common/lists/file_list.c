@@ -271,6 +271,8 @@ void *file_list_get_userdata_at_offset(const file_list_t *list, size_t idx)
 {
    if (!list)
       return NULL;
+    if(list->list == NULL)
+      return NULL;
    return list->list[idx].userdata;
 }
 

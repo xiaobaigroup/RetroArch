@@ -2553,6 +2553,8 @@ static void xmb_set_title(xmb_handle_t *xmb)
       xmb_node_t *node = (xmb_node_t*)file_list_get_userdata_at_offset(
             &xmb->horizontal_list,
             xmb->categories_selection_ptr - (xmb->system_tab_end + 1));
+      if(xmb->horizontal_list.list == NULL)
+            return;
       const char *path = xmb->horizontal_list.list[
             xmb->categories_selection_ptr - (xmb->system_tab_end + 1)].path;
 
