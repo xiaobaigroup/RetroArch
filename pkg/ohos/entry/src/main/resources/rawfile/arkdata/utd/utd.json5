@@ -1,0 +1,20 @@
+{
+  "UniformDataTypeDeclarations": [
+    {
+      "TypeId": "com.retroarch.rom",
+      "BelongingToTypes": ["general.file"],
+      "FilenameExtensions": [".nes", ".sfc", ".smc", ".gb", ".gbc", ".gba", ".n64", ".z64", ".crt", ".d64", ".v64",".iso", ".cso", ".pbp",".md", ".smd", ".gen", ".gg", ".sms",".bin", ".img", ".chd", ".cue", ".m3u"],
+      "MIMETypes": [],
+      "Description": "ROM file",
+      "ReferenceURL": ""
+    },
+    {
+      "TypeId": "com.retroarch.archive",
+      "BelongingToTypes": ["general.archive"],
+      "FilenameExtensions": [".zip", ".7z",".rar"],
+      "MIMETypes": ["application/zip", "application/x-7z-compressed"],
+      "Description": "Compressed game archive",
+      "ReferenceURL": ""
+    }
+  ]
+}

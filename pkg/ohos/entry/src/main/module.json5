@@ -16,7 +16,7 @@
       {"name":"ohos.permission.INTERNET"},
       {"name": "ohos.permission.kernel.ALLOW_WRITABLE_CODE_MEMORY"},
       {"name": "ohos.permission.LOCK_WINDOW_CURSOR"},
-      {"name": "ohos.permission.NDK_START_SELF_UI_ABILITY"}
+      {"name": "ohos.permission.NDK_START_SELF_UI_ABILITY"},
     ],
     "abilities": [
       {
@@ -35,6 +35,26 @@
             ],
             "actions": [
               "ohos.want.action.home"
+            ]
+          },
+          {
+            "actions": ["ohos.want.action.viewData"],
+            "uris": [
+              {
+                "scheme": "file",
+                "type": "general.file",
+                "linkFeature": "FileOpen"
+              },
+              {
+                "scheme": "file",
+                "utd": "com.retroarch.rom",
+                "linkFeature": "FileOpen"
+              },
+              {
+                "scheme": "file",
+                "utd": "com.retroarch.archive",
+                "linkFeature": "FileOpen"
+              }
             ]
           }
         ]

@@ -1,10 +1,12 @@
 import { AbilityConstant, ConfigurationConstant, UIAbility, Want } from '@kit.AbilityKit';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { window } from '@kit.ArkUI';
-import { SmartAvoidance, Xb_AvoidanceManager, Xb_GlobalContext, Xb_PreferenceUtil, Xb_ToastUtil } from 'xb_components';
+import { SmartAvoidance, Xb_AvoidanceManager,
+  Xb_GlobalContext, Xb_PreferenceUtil, Xb_ToastUtil } from 'xb_components';
 import { RetroSettings } from './RetroSetting';
 import { retroArchVM } from '../RetroArchViewModel';
 import { RetroState } from './RetroState';
+import { fileConnect } from '../utils/FileConnect';
 
 const DOMAIN = 0x0000;
 
@@ -29,10 +31,24 @@ export default class EntryAbility extends UIAbility {
       await Xb_PreferenceUtil.init(this.context, 'retro_arch_preference')
       // 加载配置
       RetroSettings.load()
+
+      // 2. 处理文件打开请求（初始化后执行）
+      fileConnect.wantFile(want, '')
     } catch (err) {
       hilog.error(DOMAIN, 'testTag', 'Failed to set colorMode. Cause: %{public}s', JSON.stringify(err));
     }
     hilog.info(DOMAIN, 'testTag', '%{public}s', 'Ability onCreate');
+  }
+
+  /**
+   * 接收新的Want对象（热启动）
+   * @param want - 新的Want对象
+   * @param launchParam - 启动参数
+   */
+  onNewWant(want: Want, launchParam: AbilityConstant.LaunchParam): void {
+    hilog.info(DOMAIN, 'EntryAbility', 'Ability onNewWant')
+    // 处理新的文件打开请求，替换当前游戏
+    fileConnect.wantFile(want, '')
   }
 
   onDestroy(): void {
