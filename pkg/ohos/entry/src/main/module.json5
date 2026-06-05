@@ -42,17 +42,7 @@
             "uris": [
               {
                 "scheme": "file",
-                "type": "general.file",
-                "linkFeature": "FileOpen"
-              },
-              {
-                "scheme": "file",
-                "utd": "com.retroarch.rom",
-                "linkFeature": "FileOpen"
-              },
-              {
-                "scheme": "file",
-                "utd": "com.retroarch.archive",
+                "type": "\*/\*",
                 "linkFeature": "FileOpen"
               }
             ]
