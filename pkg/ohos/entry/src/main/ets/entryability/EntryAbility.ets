@@ -33,7 +33,7 @@ export default class EntryAbility extends UIAbility {
       RetroSettings.load()
 
       // 2. 处理文件打开请求（初始化后执行）
-      fileConnect.wantFile(want, '')
+      fileConnect.wantFile(want)
     } catch (err) {
       hilog.error(DOMAIN, 'testTag', 'Failed to set colorMode. Cause: %{public}s', JSON.stringify(err));
     }
@@ -48,7 +48,7 @@ export default class EntryAbility extends UIAbility {
   onNewWant(want: Want, launchParam: AbilityConstant.LaunchParam): void {
     hilog.info(DOMAIN, 'EntryAbility', 'Ability onNewWant')
     // 处理新的文件打开请求，替换当前游戏
-    fileConnect.wantFile(want, '')
+    fileConnect.wantFile(want)
   }
 
   onDestroy(): void {

@@ -1,7 +1,11 @@
+
+/**
+ * 文件连接处理类
+ * 负责处理外部文件管理器发起的文件打开请求
+ */
 import { common, Want, wantConstant } from '@kit.AbilityKit'
 import { fileIo, fileUri } from '@kit.CoreFileKit'
 import { BusinessError, emitter } from '@kit.BasicServicesKit'
-import fs from '@ohos.file.fs'
 import { hilog } from '@kit.PerformanceAnalysisKit'
 
 /**
@@ -21,17 +25,16 @@ class FileConnect {
     '.n64', '.z64', '.v64',  // N64
     '.iso', '.cso', '.pbp',  // Sony
     '.bin', '.img',          // 通用镜像
-    '.md', '.smd', '.gen',   // Sega
+    '.md', '.smd', '.gen', '.cdi', '.elf', '.gdi', '.lst',   // Sega
     '.gg', '.sms',           // Sega掌机
-    '.chd', '.cue', '.m3u', '.d64'   // 其他格式
+    '.chd', '.cue', '.m3u', '.d64', '.dat', '.dsk', '.sna', '.skr', '.tsp', ".st", ".neo"  // 其他格式
   ]
 
   /**
    * 处理文件打开请求
    * @param want - 系统传递的Want对象
-   * @param filePath - 文件路径（可选）
    */
-  wantFile(want: Want, filePath: string): void {
+  wantFile(want: Want): void {
     const startTime = Date.now()
 
     try {
@@ -48,29 +51,25 @@ class FileConnect {
         return
       }
 
-      // 3. 获取文件路径
+      // 3. 验证文件存在性和可读性（使用URI，保留临时访问权限）
+      if (!this.validateFileAccess(uri)) {
+        this.logAndToast('文件不存在或无法访问', 'error')
+        return
+      }
+
+      // 4. 从URI提取文件路径用于类型判断
       const realPath = this.getRealPath(uri)
 
-      // 4. 验证文件类型
+      // 5. 验证文件类型
       if (!this.validateFileType(realPath)) {
         this.logAndToast('不支持此文件类型，请选择有效的游戏ROM文件', 'warn')
         return
       }
 
-      // 5. 验证文件存在性和可读性
-      if (!this.validateFileAccess(realPath)) {
-        this.logAndToast('文件不存在或无法访问', 'error')
-        return
-      }
+      // 6. 触发ROM加载
+      this.triggerRomLoad(realPath, uri)
 
-      // 6. 打开文件（获取文件句柄）
-      const file = fs.openSync(uri, fs.OpenMode.READ_ONLY)
-      hilog.info(this.DOMAIN, this.TAG, '文件打开成功: %{public}s', realPath)
-
-      // 7. 触发ROM加载（TODO: 集成到RetroArch核心）
-      this.triggerRomLoad(realPath)
-
-      // 8. 记录性能指标
+      // 7. 记录性能指标
       const elapsed = Date.now() - startTime
       hilog.info(this.DOMAIN, this.TAG, '文件处理完成，耗时: %{public}d ms', elapsed)
 
@@ -86,12 +85,10 @@ class FileConnect {
    */
   private extractUri(want: Want): string | null {
     const uri = want.uri
-
     if (!uri || uri.trim() === '') {
       return null
     }
-
-    console.info('uri:',`${uri}`)
+    hilog.info(this.DOMAIN, this.TAG, '提取URI: %{public}s', uri)
     return uri
   }
 
@@ -99,20 +96,30 @@ class FileConnect {
    * 验证URI协议安全性
    */
   private validateUriScheme(uri: string): boolean {
-    // 仅允许file://和content://协议
     const validSchemes = ['file://', 'content://']
     return validSchemes.some(scheme => uri.startsWith(scheme))
   }
 
   /**
    * 获取真实文件路径
+   * - file:// 协议：移除前缀得到文件系统路径
+   * - content:// 协议：通过 fileUri 转换获取路径
    */
   private getRealPath(uri: string): string {
-    // 移除file://前缀
     if (uri.startsWith('file://')) {
-      return uri.substring(7)
+      const path = uri.substring(7)
+      hilog.info(this.DOMAIN, this.TAG, 'realPath: %{public}s', path)
+      return path
     }
-    return uri
+    // content:// 协议：通过 FileUri 转换
+    try {
+      const path = new fileUri.FileUri(uri).path
+      hilog.info(this.DOMAIN, this.TAG, 'realPath from FileUri: %{public}s', path)
+      return path
+    } catch (err) {
+      hilog.warn(this.DOMAIN, this.TAG, 'FileUri转换失败，使用原始URI')
+      return uri
+    }
   }
 
   /**
@@ -131,31 +138,40 @@ class FileConnect {
     if (lastDot === -1) {
       return ''
     }
-    return filePath.substring(lastDot)
+    // 截取扩展名，去除可能的查询参数 (?xxx)
+    let ext = filePath.substring(lastDot)
+    const queryIndex = ext.indexOf('?')
+    if (queryIndex !== -1) {
+      ext = ext.substring(0, queryIndex)
+    }
+    return ext
   }
 
   /**
    * 验证文件访问权限
+   * 使用 fileIo（@kit.CoreFileKit）操作URI，支持 file:// 和 content://
    */
-  private validateFileAccess(filePath: string): boolean {
+  private validateFileAccess(uri: string): boolean {
     try {
-      const stat = fs.statSync(filePath)
+      const stat = fileIo.statSync(uri)
       return stat.isFile() && stat.size > 0
     } catch (err) {
+      hilog.error(this.DOMAIN, this.TAG, '文件访问验证失败: %{public}s', JSON.stringify(err))
       return false
     }
   }
 
   /**
    * 触发ROM加载
+   * @param filePath - 文件路径（用于日志和显示）
+   * @param uri - 原始URI（用于实际文件操作，保留临时访问权限）
    */
-  private triggerRomLoad(filePath: string): void {
-    // TODO: 集成到RetroArch模拟器核心
-    // 通过事件总线或全局状态通知游戏加载模块
-    hilog.info(this.DOMAIN, this.TAG, '触发ROM加载: %{public}s', filePath)
+  private triggerRomLoad(filePath: string, uri: string): void {
+    hilog.info(this.DOMAIN, this.TAG, '触发ROM加载: %{public}s', uri)
 
-    // 示例：通过emitter发送事件
-    // emitter.emit({ eventId: 1001 }, { data: filePath })
+    // TODO: 集成到RetroArch模拟器核心
+    // 传递 uri 而非 filePath，因为 uri 携带临时访问权限
+    // emitter.emit({ eventId: NativeEventId.EVENT_NATIVE_LOAD_ROM }, { data: { uri, filePath } })
   }
 
   /**
@@ -177,7 +193,6 @@ class FileConnect {
    * 日志记录和用户提示
    */
   private logAndToast(message: string, level: 'info' | 'warn' | 'error'): void {
-    // 记录日志
     if (level === 'error') {
       hilog.error(this.DOMAIN, this.TAG, message)
     } else if (level === 'warn') {
@@ -186,7 +201,6 @@ class FileConnect {
       hilog.info(this.DOMAIN, this.TAG, message)
     }
 
-    // 显示用户提示（需要ToastUtil已初始化）
     try {
       // Xb_ToastUtil.showToast(message)
     } catch (err) {
@@ -196,3 +210,4 @@ class FileConnect {
 }
 
 export const fileConnect: FileConnect = new FileConnect()
+
