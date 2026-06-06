@@ -5,6 +5,7 @@ import { common } from '@kit.AbilityKit';
 import { displaySync } from '@kit.ArkGraphics2D';
 import { display } from '@kit.ArkUI';
 import window from '@ohos.window';
+import { FileConnectUtil } from './utils/FileConnectUtil';
 
 async function initDownloadDir(context: Context) : Promise<string | undefined>{
   try {
@@ -67,7 +68,8 @@ export class RetroArchViewModel{
         const documentViewPicker = new picker.DocumentViewPicker(context);
         documentViewPicker.select(documentSaveOptions).then(async  d=>{
             if(d.length > 0){
-              let uri = new fileUri.FileUri(d[0])
+              FileConnectUtil.triggerRomLoad(d[0], this.dataDir)
+             /* let uri = new fileUri.FileUri(d[0])
               let file = await fileIo.statSync(uri.path)
               let target = this.dataDir+ "/downloads/" + uri.name;
               if(await file.isFile()){
@@ -81,7 +83,7 @@ export class RetroArchViewModel{
               }
               if(await file.isDirectory()){
                 retroApi.openFile(uri.path);
-              }
+              }*/
             }
         })
       }

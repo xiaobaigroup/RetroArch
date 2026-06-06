@@ -58,7 +58,7 @@ class FileConnect {
       }
 
       // 6. 存入downloads文件夹，触发ROM加载
-      this.triggerRomLoad(uri)
+      this.triggerRomLoad(uri, retroArchVM.dataDir)
 
       // 7. 记录性能指标
       const elapsed = Date.now() - startTime
@@ -156,19 +156,23 @@ class FileConnect {
    * 存入downloads文件夹，触发ROM加载
    * @param uri - 原始URI（用于实际文件操作，保留临时访问权限）
    */
-  private async triggerRomLoad(uri: string): Promise<void> {
-    try {
-      let uriPath = new fileUri.FileUri(uri)
-      let file = fileIo.statSync(uriPath.path)
-      let target = retroArchVM.dataDir+ "/downloads/" + uriPath.name;
-      if(file.isFile()){
-        if(! await fileIo.access(target))
-          await fileIo.copyFile(uriPath.path, target)
+  async triggerRomLoad(uriWant: string, dataDir: string): Promise<void> {
+    let uri = new fileUri.FileUri(uriWant)
+    let file = await fileIo.statSync(uri.path)
+    let target = dataDir + "/downloads/" + uri.name;
+
+    if (await file.isFile()) {
+      try {
+        if (!await fileIo.access(target))
+          await fileIo.copyFile(uri.path, target)
         retroApi.openFile(target);
+        hilog.info(this.DOMAIN, this.TAG, 'download文件夹: %{public}s',  target)
+      }catch (e) {
+        hilog.error(this.DOMAIN, this.TAG, '复制文件失败', e)
       }
-      hilog.info(this.DOMAIN, this.TAG, '存入download文件夹: %{public}s', target)
-    } catch (error) {
-      hilog.error(this.DOMAIN, this.TAG, '复制文件失败', error)
+    }
+    if(await file.isDirectory()){
+      retroApi.openFile(uri.path);
     }
   }
 
