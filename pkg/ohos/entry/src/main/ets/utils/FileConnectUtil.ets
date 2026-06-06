@@ -3,9 +3,9 @@
  * 文件连接处理类
  * 负责处理外部文件管理器发起的文件打开请求
  */
-import { common, Want, wantConstant } from '@kit.AbilityKit'
-import { fileIo, fileUri, picker } from '@kit.CoreFileKit'
-import { BusinessError, emitter } from '@kit.BasicServicesKit'
+import { Want } from '@kit.AbilityKit'
+import { fileIo, fileUri } from '@kit.CoreFileKit'
+import { BusinessError } from '@kit.BasicServicesKit'
 import { hilog } from '@kit.PerformanceAnalysisKit'
 import { SUPPORTED_EXTENSIONS } from './FileExtensionName'
 import retroApi from 'libretroarch.so';
@@ -18,7 +18,7 @@ import { Xb_ToastUtil } from 'xb_components'
  */
 @ObservedV2
 class FileConnect {
-  private readonly DOMAIN = 0x0000
+  private readonly DOMAIN = 0x0001
   private readonly TAG = 'FileConnectApp'
 
   /**
@@ -200,7 +200,10 @@ class FileConnect {
     }
 
     try {
-       Xb_ToastUtil.showToast({ message: message })
+       Xb_ToastUtil.showToast({
+         message: message,
+         duration: 2000,
+       })
     } catch (err) {
       hilog.warn(this.DOMAIN, this.TAG, 'ToastUtil未初始化，跳过用户提示')
     }
