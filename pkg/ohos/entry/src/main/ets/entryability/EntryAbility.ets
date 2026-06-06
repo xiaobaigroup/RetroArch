@@ -7,6 +7,7 @@ import { RetroSettings } from './RetroSetting';
 import { retroArchVM } from '../RetroArchViewModel';
 import { RetroState } from './RetroState';
 import { FileConnectUtil } from '../utils/FileConnectUtil';
+import { deviceInfo } from '@kit.BasicServicesKit';
 
 const DOMAIN = 0x0000;
 
@@ -33,7 +34,10 @@ export default class EntryAbility extends UIAbility {
       RetroSettings.load()
 
       // 2. 处理文件打开请求（初始化后执行）
-      FileConnectUtil.wantFile(want)
+      setTimeout(()=>{
+        FileConnectUtil.wantFile(want)
+      }, 1000)
+      
     } catch (err) {
       hilog.error(DOMAIN, 'testTag', 'Failed to set colorMode. Cause: %{public}s', JSON.stringify(err));
     }
