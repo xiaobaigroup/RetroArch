@@ -32,7 +32,7 @@ class FileConnect {
       // 1. 提取URI
       const uri = this.extractUri(want)
       if (!uri) {
-        this.logAndToast('URI无效，无法打开文件', 'warn')
+        hilog.warn(this.DOMAIN, this.TAG, 'URI无效，无法打开文件')
         return
       }
 
