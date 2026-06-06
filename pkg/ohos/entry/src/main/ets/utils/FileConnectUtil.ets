@@ -4,9 +4,13 @@
  * 负责处理外部文件管理器发起的文件打开请求
  */
 import { common, Want, wantConstant } from '@kit.AbilityKit'
-import { fileIo, fileUri } from '@kit.CoreFileKit'
+import { fileIo, fileUri, picker } from '@kit.CoreFileKit'
 import { BusinessError, emitter } from '@kit.BasicServicesKit'
 import { hilog } from '@kit.PerformanceAnalysisKit'
+import { SUPPORTED_EXTENSIONS } from './FileExtensionName'
+import retroApi from 'libretroarch.so';
+import { retroArchVM } from '../RetroArchViewModel'
+import { Xb_ToastUtil } from 'xb_components'
 
 /**
  * 文件连接处理类
@@ -16,19 +20,6 @@ import { hilog } from '@kit.PerformanceAnalysisKit'
 class FileConnect {
   private readonly DOMAIN = 0x0000
   private readonly TAG = 'FileConnectApp'
-
-  // 支持的ROM文件扩展名列表
-  private readonly SUPPORTED_EXTENSIONS = [
-    '.zip', '.7z',           // 压缩格式
-    '.nes', '.sfc', '.smc',  // Nintendo
-    '.gb', '.gbc', '.gba',   // Nintendo掌机
-    '.n64', '.z64', '.v64',  // N64
-    '.iso', '.cso', '.pbp',  // Sony
-    '.bin', '.img',          // 通用镜像
-    '.md', '.smd', '.gen', '.cdi', '.elf', '.gdi', '.lst',   // Sega
-    '.gg', '.sms',           // Sega掌机
-    '.chd', '.cue', '.m3u', '.d64', '.dat', '.dsk', '.sna', '.skr', '.tsp', ".st", ".neo"  // 其他格式
-  ]
 
   /**
    * 处理文件打开请求
@@ -66,8 +57,8 @@ class FileConnect {
         return
       }
 
-      // 6. 触发ROM加载
-      this.triggerRomLoad(realPath, uri)
+      // 6. 存入downloads文件夹，触发ROM加载
+      this.triggerRomLoad(uri)
 
       // 7. 记录性能指标
       const elapsed = Date.now() - startTime
@@ -127,7 +118,7 @@ class FileConnect {
    */
   private validateFileType(filePath: string): boolean {
     const extension = this.getFileExtension(filePath).toLowerCase()
-    return this.SUPPORTED_EXTENSIONS.includes(extension)
+    return SUPPORTED_EXTENSIONS.includes(extension)
   }
 
   /**
@@ -162,16 +153,23 @@ class FileConnect {
   }
 
   /**
-   * 触发ROM加载
-   * @param filePath - 文件路径（用于日志和显示）
+   * 存入downloads文件夹，触发ROM加载
    * @param uri - 原始URI（用于实际文件操作，保留临时访问权限）
    */
-  private triggerRomLoad(filePath: string, uri: string): void {
-    hilog.info(this.DOMAIN, this.TAG, '触发ROM加载: %{public}s', uri)
-
-    // TODO: 集成到RetroArch模拟器核心
-    // 传递 uri 而非 filePath，因为 uri 携带临时访问权限
-    // emitter.emit({ eventId: NativeEventId.EVENT_NATIVE_LOAD_ROM }, { data: { uri, filePath } })
+  private async triggerRomLoad(uri: string): Promise<void> {
+    try {
+      let uriPath = new fileUri.FileUri(uri)
+      let file = fileIo.statSync(uriPath.path)
+      let target = retroArchVM.dataDir+ "/downloads/" + uriPath.name;
+      if(file.isFile()){
+        if(! await fileIo.access(target))
+          await fileIo.copyFile(uriPath.path, target)
+        retroApi.openFile(target);
+      }
+      hilog.info(this.DOMAIN, this.TAG, '存入download文件夹: %{public}s', target)
+    } catch (error) {
+      hilog.error(this.DOMAIN, this.TAG, '复制文件失败', error)
+    }
   }
 
   /**
@@ -202,12 +200,12 @@ class FileConnect {
     }
 
     try {
-      // Xb_ToastUtil.showToast(message)
+       Xb_ToastUtil.showToast({ message: message })
     } catch (err) {
       hilog.warn(this.DOMAIN, this.TAG, 'ToastUtil未初始化，跳过用户提示')
     }
   }
 }
 
-export const fileConnect: FileConnect = new FileConnect()
+export const FileConnectUtil: FileConnect = new FileConnect()
 

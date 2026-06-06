@@ -6,7 +6,7 @@ import { SmartAvoidance, Xb_AvoidanceManager,
 import { RetroSettings } from './RetroSetting';
 import { retroArchVM } from '../RetroArchViewModel';
 import { RetroState } from './RetroState';
-import { fileConnect } from '../utils/FileConnect';
+import { FileConnectUtil } from '../utils/FileConnectUtil';
 
 const DOMAIN = 0x0000;
 
@@ -33,7 +33,7 @@ export default class EntryAbility extends UIAbility {
       RetroSettings.load()
 
       // 2. 处理文件打开请求（初始化后执行）
-      fileConnect.wantFile(want)
+      FileConnectUtil.wantFile(want)
     } catch (err) {
       hilog.error(DOMAIN, 'testTag', 'Failed to set colorMode. Cause: %{public}s', JSON.stringify(err));
     }
@@ -48,7 +48,7 @@ export default class EntryAbility extends UIAbility {
   onNewWant(want: Want, launchParam: AbilityConstant.LaunchParam): void {
     hilog.info(DOMAIN, 'EntryAbility', 'Ability onNewWant')
     // 处理新的文件打开请求，替换当前游戏
-    fileConnect.wantFile(want)
+    FileConnectUtil.wantFile(want)
   }
 
   onDestroy(): void {
@@ -70,7 +70,8 @@ export default class EntryAbility extends UIAbility {
     // Main window is created, set main page for this ability
     hilog.info(DOMAIN, 'testTag', '%{public}s', 'Ability onWindowStageCreate');
     const mainWindow = windowStage.getMainWindowSync();
-    mainWindow.setPreferredOrientation(window.Orientation.AUTO_ROTATION_LANDSCAPE_RESTRICTED);
+    //mainWindow.setPreferredOrientation(window.Orientation.AUTO_ROTATION_LANDSCAPE_RESTRICTED);
+    mainWindow.setPreferredOrientation(window.Orientation.AUTO_ROTATION_RESTRICTED);
     mainWindow.setWindowSystemBarEnable([]);
     await mainWindow.setWindowLayoutFullScreen(true);
     windowStage.loadContent('pages/Index', async (err) => {
