@@ -168,7 +168,7 @@ class FileConnect {
         retroApi.openFile(target);
         hilog.info(this.DOMAIN, this.TAG, 'download文件夹: %{public}s',  target)
       }catch (e) {
-        hilog.error(this.DOMAIN, this.TAG, '复制文件失败', e)
+        this.logAndToast(`复制文件失败:${e}`, 'error')
       }
     }
     if(await file.isDirectory()){

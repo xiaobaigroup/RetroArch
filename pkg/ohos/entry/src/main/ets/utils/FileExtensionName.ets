@@ -87,6 +87,7 @@ export const SUPPORTED_EXTENSIONS = [
   '.v32',                      // Vircon32
   '.sv',                       // Supervision
   '.wl6', '.n3d', '.sod', '.sdm', '.wl1', // Wolfenstein 3D
+  '.mgt', '.sbt', '.sad', //SAM Coupe
   '.elf', '.gdi', '.lst', '.dat', '.skr', '.tsp', // 其他
   // ScummVM 游戏ID（含数字/字母标识符，已去除含空格/特殊字符的非扩展名项如 "Seuss's ABC"、"#02"、"$00"、"(A)"、"2 US"、"99 (PG)"）
   '.0', '.1', '.2', '.3', '.4', '.5', '.6', '.8', '.12', '.25', '.26', '.34',
