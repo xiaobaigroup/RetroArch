@@ -1,8 +1,8 @@
 {
   "app": {
-    "bundleName": "org.xbstudio.gamebox",
+    "bundleName": "org.xbstudio.gameboxpro",
     "vendor": "example",
-    "versionCode": 1022000,
+    "versionCode": 1022011,
     "versionName": "1.22.0",
     "buildVersion": "1",
     "icon": "$media:layered_image",
