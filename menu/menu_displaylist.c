@@ -15297,14 +15297,12 @@ bool menu_displaylist_ctl(enum menu_displaylist_ctl_state type,
                         MENU_SETTING_ACTION, 0, 0, NULL))
                   count++;
 #endif
-#ifndef __OHOS__
-               if (menu_entries_append(info->list,
+                if (menu_entries_append(info->list,
                         msg_hash_to_str(MENU_ENUM_LABEL_VALUE_DOWNLOAD_CORE_CONTENT),
                         MENU_ENUM_LABEL_DOWNLOAD_CORE_CONTENT_DIRS_STR,
                         MENU_ENUM_LABEL_DOWNLOAD_CORE_CONTENT_DIRS,
                         MENU_SETTING_ACTION, 0, 0, NULL))
                   count++;
-#endif
 #ifdef HAVE_ONLINE_UPDATER
                if (MENU_DISPLAYLIST_PARSE_SETTINGS_ENUM(info->list,
                      MENU_ENUM_LABEL_UPDATER_SETTINGS,
