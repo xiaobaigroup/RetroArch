@@ -2,15 +2,15 @@
   "string": [
     {
       "name": "module_desc",
-      "value": "GameBoxPro by HarmonyOS"
+      "value": "GameBox Pro by HarmonyOS"
     },
     {
       "name": "EntryAbility_desc",
-      "value": "GameBoxPro by HarmonyOS"
+      "value": "GameBox Pro by HarmonyOS"
     },
     {
       "name": "EntryAbility_label",
-      "value": "GameBoxPro"
+      "value": "GameBox Pro"
     }
   ]
 }
