@@ -3805,6 +3805,9 @@ void ohos_input_poll_native_key_event(void* ohos_input, struct OH_NativeXCompone
 void ohos_input_poll_native_mouse_event(void* ohos_input, OH_NativeXComponent_MouseEvent* data);
 void ohos_input_poll_key_event(void* ohos_input, KeyEvent* data);
 
+void ohos_input_poll_sensor_value(void* ohos_input,int type, int x, int y, int z);
+
+
 bool ohos_keyboard_start(char **buffer_ptr, size_t *size_ptr, size_t *ptr_ptr,
                                 const char *label,
                                 input_keyboard_line_complete_t callback, void *userdata){
@@ -3845,6 +3848,22 @@ static napi_value StopApp(napi_env env, napi_callback_info info){
     retroarch_main_quit();
     return NULL;
 }
+static napi_value OnSensor(napi_env env, napi_callback_info info){
+   size_t argc = 4;
+   napi_value args[4];
+   napi_status status = napi_get_cb_info(env, info, &argc, args, NULL, NULL);
+   int type;
+   int x;
+   int y;
+   int z;
+   napi_get_value_int32(env, args[0], &type);
+   napi_get_value_int32(env, args[1], &x);
+   napi_get_value_int32(env, args[2], &y);
+   napi_get_value_int32(env, args[3], &z);
+   ohos_input_poll_sensor_value(g_ohos->ohos_input,type, x,y,z);
+   return NULL;
+}
+
     
 static napi_value StartApp(napi_env env, napi_callback_info info)
 {
@@ -4227,6 +4246,7 @@ static napi_value Init(napi_env env, napi_value exports)
       { "openFile", NULL, OpenFile, NULL, NULL, NULL, napi_default, NULL },
       { "onKeyEvent", NULL, OnKeyEvent, NULL, NULL, NULL, napi_default, NULL },
       { "stopApp", NULL, StopApp, NULL, NULL, NULL, napi_default, NULL },
+      { "onGravity", NULL, OnSensor, NULL, NULL, NULL, napi_default, NULL },
    };
    napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc);
    return exports;

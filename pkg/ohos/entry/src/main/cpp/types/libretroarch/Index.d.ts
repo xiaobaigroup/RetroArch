@@ -17,5 +17,8 @@ export const onTouchEvent: (touch: any)=>number;
 export const onKeyEvent: (touch: any)=>number;
 export const openFile: (filepath: string)=>number;
 export const onNativeEvent: (callback: (eventId: number, value: number)=>void)=> void;
+export const onSensor:(type:number, x:number,y: number, z:number)=> void;
+
+export const onAxisScroll:(x:number,y: number, z:number)=> void;
 
 export const sendCtl: (ctl: number) => number;
