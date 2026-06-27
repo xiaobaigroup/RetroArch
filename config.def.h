@@ -1263,14 +1263,8 @@
 #define DEFAULT_IN_LATENCY 64
 #endif
 
-#ifdef __OHOS__
-/* OHOS has a bug that blocks the thread */
-#define DEFAULT_AUDIO_SYNC false
-#else
-
 /* Will sync audio. (recommended) */
 #define DEFAULT_AUDIO_SYNC true
-#endif
 
 /* Audio rate control. */
 #if !defined(RARCH_CONSOLE)

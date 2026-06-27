@@ -6694,6 +6694,9 @@ static void retroarch_print_features(void)
 #ifdef HAVE_SL
    _len += _PSUPP_BUF(buf, _len, SUPPORTS_SL,              "OpenSL",          "Audio driver");
 #endif
+#ifdef __OHOS__
+   _len += _PSUPP_BUF(buf, _len, SUPPORTS_SL,              "OhAudio",          "Audio driver");
+#endif
 #ifdef HAVE_OSS
    _len += _PSUPP_BUF(buf, _len, SUPPORTS_OSS,             "OSS",             "Audio driver");
 #endif
