@@ -4246,7 +4246,7 @@ static napi_value Init(napi_env env, napi_value exports)
       { "openFile", NULL, OpenFile, NULL, NULL, NULL, napi_default, NULL },
       { "onKeyEvent", NULL, OnKeyEvent, NULL, NULL, NULL, napi_default, NULL },
       { "stopApp", NULL, StopApp, NULL, NULL, NULL, napi_default, NULL },
-      { "onGravity", NULL, OnSensor, NULL, NULL, NULL, napi_default, NULL },
+      { "onSensor", NULL, OnSensor, NULL, NULL, NULL, napi_default, NULL },
    };
    napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc);
    return exports;
