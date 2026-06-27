@@ -3802,6 +3802,7 @@ typedef struct {
 void ohos_input_poll_touch_event(void* ohos_input, OH_NativeXComponent_TouchEvent data);
 
 void ohos_input_poll_native_key_event(void* ohos_input, struct OH_NativeXComponent_KeyEvent* data);
+void ohos_input_poll_native_mouse_event(void* ohos_input, OH_NativeXComponent_MouseEvent* data);
 void ohos_input_poll_key_event(void* ohos_input, KeyEvent* data);
 
 bool ohos_keyboard_start(char **buffer_ptr, size_t *size_ptr, size_t *ptr_ptr,
@@ -4080,7 +4081,13 @@ static void DispatchTouchEventCB(OH_NativeXComponent *component, void *window)
    }
    OH_NativeXComponent_TouchEvent touchEvent;
    OH_NativeXComponent_GetTouchEvent(component,window, &touchEvent);
-   ohos_input_poll_touch_event(g_ohos->ohos_input, touchEvent);
+
+    OH_NativeXComponent_EventSourceType type;
+    OH_NativeXComponent_GetTouchEventSourceType(component, touchEvent.id, &type);
+    if(type == OH_NATIVEXCOMPONENT_SOURCE_TYPE_TOUCHSCREEN || type == OH_NATIVEXCOMPONENT_SOURCE_TYPE_JOYSTICK){
+        ohos_input_poll_touch_event(g_ohos->ohos_input, touchEvent);
+    }
+  
 }
 static void DispatchKeyEventCB(OH_NativeXComponent *component, void *window)
 {
@@ -4091,7 +4098,22 @@ static void DispatchKeyEventCB(OH_NativeXComponent *component, void *window)
    OH_NativeXComponent_GetKeyEvent(component, &event);
    ohos_input_poll_native_key_event(g_ohos->ohos_input, event);
 }
+static void OnDispatchMouseEvent(OH_NativeXComponent *component, void *window)
+{
+   if ((NULL == component) || (NULL == window)) {
+     return;
+   }
+   OH_NativeXComponent_MouseEvent mouseEvent;
 
+   OH_NativeXComponent_GetMouseEvent(component, window, &mouseEvent);
+   ohos_input_poll_native_mouse_event(g_ohos->ohos_input, &mouseEvent);
+}
+static void OnDispatchHoverEvent(OH_NativeXComponent *component, bool isHover)
+{
+   if ((NULL == component)) {
+     return;
+   }
+}
 static napi_value SurfaceChanged(napi_env env, napi_callback_info info)
 {
    size_t argc = 3;
@@ -4120,11 +4142,16 @@ static napi_value SurfaceChanged(napi_env env, napi_callback_info info)
     }
    return NULL;
 }
+
 static OH_NativeXComponent_Callback renderCallback = {
    OnSurfaceCreatedCB,
    OnSurfaceChangedCB,
    OnSurfaceDestroyedCB,
    DispatchTouchEventCB
+};
+static OH_NativeXComponent_MouseEvent_Callback mouseCallback = {
+   OnDispatchMouseEvent,
+   OnDispatchHoverEvent
 };
 void init_surface(napi_env env, napi_value exports){
    napi_value exportInstance = NULL;
@@ -4136,6 +4163,7 @@ void init_surface(napi_env env, napi_value exports){
    }
    OH_NativeXComponent_RegisterCallback(g_ohos->nativeComponent, &renderCallback);
    OH_NativeXComponent_RegisterKeyEventCallback(g_ohos->nativeComponent, DispatchKeyEventCB);
+   OH_NativeXComponent_RegisterMouseEventCallback(g_ohos->nativeComponent, &mouseCallback);
 }
 
 void ohos_file_load_with_detect_core(const char *filename)

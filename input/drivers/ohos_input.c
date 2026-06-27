@@ -106,6 +106,7 @@ void ohos_input_poll_touch_event(
    video_driver_state_t *video_st   = video_state_get_ptr();
    if(ohos_input == NULL || video_st->data == NULL)
       return;
+    
    ohos_input_t* ohos = (ohos_input_t*)ohos_input;
    int motion_ptr = event.id;
    int action        = event.type;
@@ -189,6 +190,45 @@ void ohos_input_poll_button_event(
          BIT_SET(buf, keysym);
          break;
    }
+}
+void ohos_input_poll_native_mouse_event(
+    void  *ohos_input,  OH_NativeXComponent_MouseEvent *event)
+{
+   ohos_input_t* ohos = (ohos_input_t*)ohos_input;
+   if(ohos == NULL){
+      return;
+   }
+   unsigned video_width, video_height;
+   video_driver_get_output_size(&video_width, &video_height);
+
+   float x       = 0;
+   float x_min   = 0;
+   float x_max   = (float)video_width;
+
+   float y       = 0;
+   float y_min   = 0;
+   float y_max   = (float)video_height;
+   
+   x = event->x;
+   y = event->y;
+    
+   if (x < x_min) x = x_min;
+   else if (x > x_max) x = x_max;
+   if (y < y_min) y = y_min;
+   else if (y > y_max) y = y_max;
+   ohos->mouse_x = x;
+   ohos->mouse_y = y;
+   if(event->action == OH_NATIVEXCOMPONENT_MOUSE_PRESS){
+      ohos->mouse_l = event->button & OH_NATIVEXCOMPONENT_LEFT_BUTTON;
+      ohos->mouse_r = event->button & OH_NATIVEXCOMPONENT_RIGHT_BUTTON;
+      ohos->mouse_m = event->button & OH_NATIVEXCOMPONENT_MIDDLE_BUTTON;
+   }
+   if(event->action == OH_NATIVEXCOMPONENT_MOUSE_RELEASE){
+        ohos->mouse_l =  0;
+        ohos->mouse_r =  0;
+        ohos->mouse_m = 0;
+   }
+   
 }
 void ohos_input_poll_native_key_event(
     void  *ohos_input, struct OH_NativeXComponent_KeyEvent *event)
@@ -592,7 +632,7 @@ static int16_t ohos_input_state(
                   return ohos->mouse_m;
                case RETRO_DEVICE_ID_MOUSE_X:
                   if (device == RARCH_DEVICE_MOUSE_SCREEN)
-                     return ohos->mouse_x_viewport_screen;
+                     return ohos->mouse_x;
 
                   val = ohos->mouse_x_delta;
                   ohos->mouse_x_delta = 0;
@@ -600,7 +640,7 @@ static int16_t ohos_input_state(
                   return val;
                case RETRO_DEVICE_ID_MOUSE_Y:
                   if (device == RARCH_DEVICE_MOUSE_SCREEN)
-                     return ohos->mouse_y_viewport_screen;
+                     return ohos->mouse_y;
 
                   val = ohos->mouse_y_delta;
                   ohos->mouse_y_delta = 0;
@@ -738,7 +778,10 @@ static void ohos_input_poll(void *data)
 {
    ohos_input_t *ohos = (ohos_input_t*)data;
    uint32_t i;
-    
+   ohos->mouse_x_delta = ohos->mouse_x - ohos->mouse_x_prev;
+   ohos->mouse_x_prev = ohos->mouse_x ;
+   ohos->mouse_y_delta = ohos->mouse_y - ohos->mouse_y_prev;
+   ohos->mouse_y_prev = ohos->mouse_y ;
    for (i = 0; i < ohos->pointer_count || i == 0; i++)
    {
          struct video_viewport vp = {0};
