@@ -6,6 +6,8 @@ import { displaySync } from '@kit.ArkGraphics2D';
 import { display } from '@kit.ArkUI';
 import window from '@ohos.window';
 import { FileConnectUtil } from './utils/FileConnectUtil';
+import { sensor } from '@kit.SensorServiceKit';
+
 
 async function initDownloadDir(context: Context) : Promise<string | undefined>{
   try {
@@ -43,12 +45,28 @@ export class RetroArchViewModel{
   stopApp(){
     retroApi.stopApp()
   }
+
+  initSensor(){
+    try {
+      sensor.on(sensor.SensorId.GRAVITY, (data: sensor.AccelerometerResponse) => {
+        retroApi.onSensor(0, data.x, data.y, data.z)
+      }, { interval:  100000000});
+      sensor.on(sensor.SensorId.ACCELEROMETER, (data: sensor.AccelerometerResponse) => {
+        retroApi.onSensor(1, data.x, data.y, data.z)
+      }, { interval: 100000000  });
+    } catch (error) {
+      let e: BusinessError = error as BusinessError;
+      console.error(`Failed to invoke on. Code: ${e.code}, message: ${e.message}`);
+    }
+  }
   init(context: common.UIAbilityContext){
     this.context = context;
     this.currentRotation = display.getDefaultDisplaySync().rotation
     display.on("change", ()=>{
       this.currentRotation = display.getDefaultDisplaySync().rotation
     })
+    this.initSensor();
+
     retroApi.onNativeEvent((eventId: number, value: number)=>{
       if(eventId == NativeEventId.EVENT_NATIVE_APP_SHUTDOWN){
         this.context?.terminateSelf();

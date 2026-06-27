@@ -230,6 +230,22 @@ void ohos_input_poll_native_mouse_event(
    }
    
 }
+void ohos_input_poll_sensor_value(void* ohos_input,int type, int x, int y, int z){
+   ohos_input_t* ohos = (ohos_input_t*)ohos_input;
+   if (ohos == NULL)
+      return;
+    if (type == 0) {
+      ohos->gyroscope_state.x = x;
+      ohos->gyroscope_state.y = y;
+      ohos->gyroscope_state.z = z;
+    } else {
+      ohos->accelerometer_state.x = x;
+      ohos->accelerometer_state.y = y;
+      ohos->accelerometer_state.z = z;
+    }
+    
+}
+
 void ohos_input_poll_native_key_event(
     void  *ohos_input, struct OH_NativeXComponent_KeyEvent *event)
 {
@@ -297,6 +313,7 @@ void ohos_input_poll_native_key_event(
          break;
    }
 }
+
 void ohos_input_poll_key_event(
     void  *ohos_input, KeyEvent *event)
 {
@@ -764,13 +781,24 @@ static float ohos_input_get_sensor_input(void *data, unsigned port, unsigned id)
 
    if (!ohos)
       return 0.0f;
-
-   switch (id)
+   if (port == 0)
    {
-      default:
-         break;
+      switch (id)
+      {
+         case RETRO_SENSOR_ACCELEROMETER_X:
+            return ohos->accelerometer_state.x / 9.80665f;
+         case RETRO_SENSOR_ACCELEROMETER_Y:
+            return ohos->accelerometer_state.y / 9.80665f;
+         case RETRO_SENSOR_ACCELEROMETER_Z:
+            return ohos->accelerometer_state.z / 9.80665f;
+         case RETRO_SENSOR_GYROSCOPE_X:
+            return ohos->gyroscope_state.x;
+         case RETRO_SENSOR_GYROSCOPE_Y:
+            return ohos->gyroscope_state.y;
+         case RETRO_SENSOR_GYROSCOPE_Z:
+            return ohos->gyroscope_state.z;
+      }
    }
-
    return 0.0f;
 }
 
