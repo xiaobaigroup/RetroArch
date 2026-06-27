@@ -168,6 +168,7 @@ enum audio_driver_enum
    AUDIO_CTR,
    AUDIO_SWITCH,
    AUDIO_PIPEWIRE,
+   AUDIO_OHAUDIO,
    AUDIO_NULL
 };
 
@@ -564,6 +565,8 @@ static const enum audio_driver_enum AUDIO_DEFAULT_DRIVER = AUDIO_XAUDIO;
 static const enum audio_driver_enum AUDIO_DEFAULT_DRIVER = AUDIO_DSOUND;
 #elif defined(HAVE_AL)
 static const enum audio_driver_enum AUDIO_DEFAULT_DRIVER = AUDIO_AL;
+#elif defined(__OHOS__)
+static const enum audio_driver_enum AUDIO_DEFAULT_DRIVER = AUDIO_OHAUDIO;
 #elif defined(HAVE_SL)
 static const enum audio_driver_enum AUDIO_DEFAULT_DRIVER = AUDIO_SL;
 #elif defined(HAVE_AUDIOWORKLET)
@@ -1010,6 +1013,8 @@ const char *config_get_default_audio(void)
          return "audioworklet";
       case AUDIO_JACK:
          return "jack";
+      case AUDIO_OHAUDIO:
+         return "ohaudio";
       case AUDIO_NULL:
          break;
    }
